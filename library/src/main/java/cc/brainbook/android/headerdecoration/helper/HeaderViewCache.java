@@ -1,4 +1,4 @@
-package cc.brainbook.android.headerdecoration.caching;
+package cc.brainbook.android.headerdecoration.helper;
 
 import android.support.v4.util.LongSparseArray;
 import android.support.v7.widget.LinearLayoutManager;

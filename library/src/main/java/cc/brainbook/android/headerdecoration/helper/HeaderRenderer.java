@@ -1,4 +1,4 @@
-package cc.brainbook.android.headerdecoration.rendering;
+package cc.brainbook.android.headerdecoration.helper;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;

@@ -8,11 +8,12 @@ import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.View;
 
-import cc.brainbook.android.headerdecoration.caching.HeaderViewCache;
+import cc.brainbook.android.headerdecoration.helper.HeaderPositionCalculator;
+import cc.brainbook.android.headerdecoration.helper.HeaderViewCache;
 import cc.brainbook.android.headerdecoration.util.DimensionUtil;
 import cc.brainbook.android.headerdecoration.interfaces.HeaderAdapter;
 import cc.brainbook.android.headerdecoration.interfaces.ItemVisibilityAdapter;
-import cc.brainbook.android.headerdecoration.rendering.HeaderRenderer;
+import cc.brainbook.android.headerdecoration.helper.HeaderRenderer;
 import cc.brainbook.android.headerdecoration.util.LayoutManagerUtil;
 
 public class HeaderDecoration extends RecyclerView.ItemDecoration {

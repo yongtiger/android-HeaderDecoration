@@ -1,4 +1,4 @@
-package cc.brainbook.android.headerdecoration;
+package cc.brainbook.android.headerdecoration.helper;
 
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import cc.brainbook.android.headerdecoration.caching.HeaderViewCache;
 import cc.brainbook.android.headerdecoration.util.DimensionUtil;
 import cc.brainbook.android.headerdecoration.interfaces.HeaderAdapter;
 import cc.brainbook.android.headerdecoration.util.LayoutManagerUtil;
