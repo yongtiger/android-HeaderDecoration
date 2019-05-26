@@ -1,4 +1,4 @@
-package cc.brainbook.android.headerdecoration;
+package cc.brainbook.android.headerdecoration.listener;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -6,6 +6,9 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;
+
+import cc.brainbook.android.headerdecoration.interfaces.HeaderAdapter;
+import cc.brainbook.android.headerdecoration.HeaderDecoration;
 
 public class HeaderTouchListener implements RecyclerView.OnItemTouchListener {
     private final GestureDetector mGestureDetector;
@@ -48,7 +51,7 @@ public class HeaderTouchListener implements RecyclerView.OnItemTouchListener {
                 return true;
             }
             if (e.getAction() == MotionEvent.ACTION_DOWN) {
-                int position = mHeaderDecoration.findHeaderPositionUnder((int)e.getX(), (int)e.getY());
+                final int position = mHeaderDecoration.findHeaderPositionUnder((int)e.getX(), (int)e.getY());
                 return position != -1;
             }
         }
@@ -65,10 +68,10 @@ public class HeaderTouchListener implements RecyclerView.OnItemTouchListener {
     private class SingleTapDetector extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
-            int position = mHeaderDecoration.findHeaderPositionUnder((int) e.getX(), (int) e.getY());
+            final int position = mHeaderDecoration.findHeaderPositionUnder((int) e.getX(), (int) e.getY());
             if (position != -1) {
-                View headerView = mHeaderDecoration.getHeaderView(mRecyclerView, position);
-                long headerId = getAdapter().getHeaderId(position);
+                final View headerView = mHeaderDecoration.getHeaderView(mRecyclerView, position);
+                final long headerId = getAdapter().getHeaderId(position);
                 mOnHeaderClickListener.onHeaderClick(headerView, position, headerId);
                 mRecyclerView.playSoundEffect(SoundEffectConstants.CLICK);
                 headerView.onTouchEvent(e);

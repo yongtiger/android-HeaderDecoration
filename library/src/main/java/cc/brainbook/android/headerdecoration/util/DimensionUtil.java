@@ -1,4 +1,4 @@
-package cc.brainbook.android.headerdecoration.calculation;
+package cc.brainbook.android.headerdecoration.util;
 
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
@@ -10,20 +10,19 @@ import static android.view.ViewGroup.MarginLayoutParams;
 /**
  * Helper to calculate various view dimensions
  */
-public class DimensionCalculator {
+public class DimensionUtil {
 
     /**
      * Populates {@link Rect} with margins for any view.
      *
-     *
      * @param margins rect to populate
      * @param view for which to get margins
      */
-    public void initMargins(Rect margins, View view) {
-        LayoutParams layoutParams = view.getLayoutParams();
+    public static void initMargins(Rect margins, @NonNull View view) {
+        final LayoutParams layoutParams = view.getLayoutParams();
 
         if (layoutParams instanceof MarginLayoutParams) {
-            MarginLayoutParams marginLayoutParams = (MarginLayoutParams) layoutParams;
+            final MarginLayoutParams marginLayoutParams = (MarginLayoutParams) layoutParams;
             initMarginRect(margins, marginLayoutParams);
         } else {
             margins.set(0, 0, 0, 0);
@@ -37,7 +36,7 @@ public class DimensionCalculator {
      * {@link MarginLayoutParams#leftMargin} is equivalent to {@link Rect#left}, etc.
      * @param marginLayoutParams margins to populate the Rect with
      */
-    private void initMarginRect(@NonNull Rect marginRect, @NonNull MarginLayoutParams marginLayoutParams) {
+    private static void initMarginRect(@NonNull Rect marginRect, @NonNull MarginLayoutParams marginLayoutParams) {
         marginRect.set(
                 marginLayoutParams.leftMargin,
                 marginLayoutParams.topMargin,
@@ -46,4 +45,5 @@ public class DimensionCalculator {
         );
     }
 
+    private DimensionUtil() {}
 }

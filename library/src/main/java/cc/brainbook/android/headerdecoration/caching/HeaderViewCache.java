@@ -6,7 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
-import cc.brainbook.android.headerdecoration.HeaderAdapter;
+import cc.brainbook.android.headerdecoration.interfaces.HeaderAdapter;
 import cc.brainbook.android.headerdecoration.util.LayoutManagerUtil;
 
 public class HeaderViewCache {
@@ -26,7 +26,7 @@ public class HeaderViewCache {
      * @return a header view for the given position and list
      */
     public View getHeader(RecyclerView recyclerView, int position) {
-        long headerId = mAdapter.getHeaderId(position);
+        final long headerId = mAdapter.getHeaderId(position);
 
         View header = mHeaderViews.get(headerId);
         if (header == null) {
@@ -50,9 +50,9 @@ public class HeaderViewCache {
                 heightSpec = View.MeasureSpec.makeMeasureSpec(recyclerView.getHeight(), View.MeasureSpec.EXACTLY);
             }
 
-            int childWidth = ViewGroup.getChildMeasureSpec(widthSpec,
+            final int childWidth = ViewGroup.getChildMeasureSpec(widthSpec,
                     recyclerView.getPaddingLeft() + recyclerView.getPaddingRight(), header.getLayoutParams().width);
-            int childHeight = ViewGroup.getChildMeasureSpec(heightSpec,
+            final int childHeight = ViewGroup.getChildMeasureSpec(heightSpec,
                     recyclerView.getPaddingTop() + recyclerView.getPaddingBottom(), header.getLayoutParams().height);
             header.measure(childWidth, childHeight);
             header.layout(0, 0, header.getMeasuredWidth(), header.getMeasuredHeight());

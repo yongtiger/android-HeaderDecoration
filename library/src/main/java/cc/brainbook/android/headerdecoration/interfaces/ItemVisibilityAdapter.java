@@ -1,4 +1,4 @@
-package cc.brainbook.android.headerdecoration;
+package cc.brainbook.android.headerdecoration.interfaces;
 
 /**
  * ItemVisibilityAdapter provides a way for HeaderDecoration
@@ -25,4 +25,5 @@ public interface ItemVisibilityAdapter {
      * @param position the adapter position
      */
     boolean isPositionVisible(final int position);
+
 }

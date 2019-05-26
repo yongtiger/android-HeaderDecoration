@@ -6,7 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import cc.brainbook.android.headerdecoration.calculation.DimensionCalculator;
+import cc.brainbook.android.headerdecoration.util.DimensionUtil;
 import cc.brainbook.android.headerdecoration.util.LayoutManagerUtil;
 
 /**
@@ -14,21 +14,11 @@ import cc.brainbook.android.headerdecoration.util.LayoutManagerUtil;
  */
 public class HeaderRenderer {
 
-    private final DimensionCalculator mDimensionCalculator;
-
     /**
      * The following field is used as a buffer for internal calculations. Its sole purpose is to avoid
      * allocating new Rect every time we need one.
      */
     private final Rect mTempRect = new Rect();
-
-    public HeaderRenderer() {
-        this(new DimensionCalculator());
-    }
-
-    private HeaderRenderer(DimensionCalculator dimensionCalculator) {
-        mDimensionCalculator = dimensionCalculator;
-    }
 
     /**
      * Draws a header to a canvas, offsetting by some x and y amount
@@ -66,7 +56,7 @@ public class HeaderRenderer {
      * @param header       for clipping
      */
     private void initClipRectForHeader(Rect clipRect, RecyclerView recyclerView, View header) {
-        mDimensionCalculator.initMargins(clipRect, header);
+        DimensionUtil.initMargins(clipRect, header);
         if (LayoutManagerUtil.getOrientation(recyclerView) == LinearLayout.VERTICAL) {
             clipRect.set(
                     recyclerView.getPaddingLeft(),

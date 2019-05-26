@@ -21,9 +21,9 @@ import android.widget.ToggleButton;
 
 import java.security.SecureRandom;
 
-import cc.brainbook.android.headerdecoration.HeaderAdapter;
+import cc.brainbook.android.headerdecoration.interfaces.HeaderAdapter;
 import cc.brainbook.android.headerdecoration.HeaderDecoration;
-import cc.brainbook.android.headerdecoration.HeaderTouchListener;
+import cc.brainbook.android.headerdecoration.listener.HeaderTouchListener;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "TAG";

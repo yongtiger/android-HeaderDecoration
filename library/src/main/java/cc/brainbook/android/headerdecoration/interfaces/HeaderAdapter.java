@@ -1,9 +1,10 @@
-package cc.brainbook.android.headerdecoration;
+package cc.brainbook.android.headerdecoration.interfaces;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 public interface HeaderAdapter<VH extends RecyclerView.ViewHolder> {
+
     /**
      * Get the ID of the header associated with this item.  For example, if your headers group
      * items by their first letter, you could return the character representation of the first letter.

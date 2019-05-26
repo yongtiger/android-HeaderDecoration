@@ -9,7 +9,9 @@ import android.util.SparseArray;
 import android.view.View;
 
 import cc.brainbook.android.headerdecoration.caching.HeaderViewCache;
-import cc.brainbook.android.headerdecoration.calculation.DimensionCalculator;
+import cc.brainbook.android.headerdecoration.util.DimensionUtil;
+import cc.brainbook.android.headerdecoration.interfaces.HeaderAdapter;
+import cc.brainbook.android.headerdecoration.interfaces.ItemVisibilityAdapter;
 import cc.brainbook.android.headerdecoration.rendering.HeaderRenderer;
 import cc.brainbook.android.headerdecoration.util.LayoutManagerUtil;
 
@@ -25,8 +27,6 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
     }
 
     private final HeaderAdapter mHeaderAdapter;
-    private final DimensionCalculator mDimensionCalculator;
-
     private final ItemVisibilityAdapter mVisibilityAdapter;
     private final SparseArray<Rect> mHeaderRects = new SparseArray<>();
     private final HeaderViewCache mHeaderViewCache;
@@ -41,49 +41,34 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
     private final Rect mTempRect = new Rect();
 
     public HeaderDecoration(HeaderAdapter headerAdapter) {
-        this(headerAdapter,
-                new DimensionCalculator(),
-                null);
-    }
-
-    public HeaderDecoration(HeaderAdapter headerAdapter,
-                            ItemVisibilityAdapter visibilityAdapter) {
-        this(headerAdapter,
-                new DimensionCalculator(),
-                visibilityAdapter);
+        this(headerAdapter, null);
     }
 
     private HeaderDecoration(HeaderAdapter headerAdapter,
-                             DimensionCalculator dimensionCalculator,
                              ItemVisibilityAdapter visibilityAdapter) {
         this(headerAdapter,
-                dimensionCalculator,
                 visibilityAdapter,
                 new HeaderRenderer(),
                 new HeaderViewCache(headerAdapter));
     }
 
     private HeaderDecoration(HeaderAdapter headerAdapter,
-                             DimensionCalculator dimensionCalculator,
                              ItemVisibilityAdapter visibilityAdapter,
                              HeaderRenderer headerRenderer,
                              HeaderViewCache headerViewCache) {
         this(headerAdapter,
-                dimensionCalculator,
                 visibilityAdapter,
                 headerRenderer,
                 headerViewCache,
-                new HeaderPositionCalculator(headerAdapter, headerViewCache, dimensionCalculator));
+                new HeaderPositionCalculator(headerAdapter, headerViewCache));
     }
 
     private HeaderDecoration(HeaderAdapter headerAdapter,
-                             DimensionCalculator dimensionCalculator,
                              ItemVisibilityAdapter visibilityAdapter,
                              HeaderRenderer headerRenderer,
                              HeaderViewCache headerViewCache,
                              HeaderPositionCalculator headerPositionCalculator) {
         mHeaderAdapter = headerAdapter;
-        mDimensionCalculator = dimensionCalculator;
         mVisibilityAdapter = visibilityAdapter;
         mHeaderRenderer = headerRenderer;
         mHeaderViewCache = headerViewCache;
@@ -112,7 +97,7 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
      * @param orientation used to calculate offset for the item
      */
     private void setItemOffsetsForHeader(Rect itemOffsets, View header, int orientation) {
-        mDimensionCalculator.initMargins(mTempRect, header);
+        DimensionUtil.initMargins(mTempRect, header);
         if (orientation == LinearLayoutManager.VERTICAL) {
             itemOffsets.top = header.getHeight() + mTempRect.top + mTempRect.bottom;
         } else {
