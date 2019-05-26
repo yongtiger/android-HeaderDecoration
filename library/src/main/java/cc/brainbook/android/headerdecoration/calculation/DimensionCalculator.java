@@ -1,6 +1,7 @@
 package cc.brainbook.android.headerdecoration.calculation;
 
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import static android.view.ViewGroup.LayoutParams;
@@ -36,7 +37,7 @@ public class DimensionCalculator {
      * {@link MarginLayoutParams#leftMargin} is equivalent to {@link Rect#left}, etc.
      * @param marginLayoutParams margins to populate the Rect with
      */
-    private void initMarginRect(Rect marginRect, MarginLayoutParams marginLayoutParams) {
+    private void initMarginRect(@NonNull Rect marginRect, @NonNull MarginLayoutParams marginLayoutParams) {
         marginRect.set(
                 marginLayoutParams.leftMargin,
                 marginLayoutParams.topMargin,

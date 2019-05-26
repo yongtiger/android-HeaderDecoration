@@ -1,13 +1,14 @@
 package cc.brainbook.android.headerdecoration;
 
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import cc.brainbook.android.headerdecoration.caching.HeaderProvider;
+import cc.brainbook.android.headerdecoration.caching.HeaderViewCache;
 import cc.brainbook.android.headerdecoration.calculation.DimensionCalculator;
 import cc.brainbook.android.headerdecoration.util.LayoutManagerUtil;
 
@@ -17,7 +18,7 @@ import cc.brainbook.android.headerdecoration.util.LayoutManagerUtil;
 public class HeaderPositionCalculator {
 
     private final HeaderAdapter mHeaderAdapter;
-    private final HeaderProvider mHeaderProvider;
+    private final HeaderViewCache mHeaderViewCache;
     private final DimensionCalculator mDimensionCalculator;
 
     /**
@@ -27,10 +28,10 @@ public class HeaderPositionCalculator {
     private final Rect mTempRect1 = new Rect();
     private final Rect mTempRect2 = new Rect();
 
-    public HeaderPositionCalculator(HeaderAdapter headerAdapter, HeaderProvider headerProvider,
+    public HeaderPositionCalculator(HeaderAdapter headerAdapter, HeaderViewCache headerProvider,
                                     DimensionCalculator dimensionCalculator) {
         mHeaderAdapter = headerAdapter;
-        mHeaderProvider = headerProvider;
+        mHeaderViewCache = headerProvider;
         mDimensionCalculator = dimensionCalculator;
     }
 
@@ -99,13 +100,13 @@ public class HeaderPositionCalculator {
         if (firstHeader && isStickyHeaderBeingPushedOffscreen(recyclerView, header)) {
             View viewAfterNextHeader = getFirstViewUnobscuredByHeader(recyclerView, header);
             int firstViewUnderHeaderPosition = recyclerView.getChildAdapterPosition(viewAfterNextHeader);
-            View secondHeader = mHeaderProvider.getHeader(recyclerView, firstViewUnderHeaderPosition);
+            View secondHeader = mHeaderViewCache.getHeader(recyclerView, firstViewUnderHeaderPosition);
             translateHeaderWithNextHeader(recyclerView, LayoutManagerUtil.getOrientation(recyclerView), bounds,
                     header, viewAfterNextHeader, secondHeader);
         }
     }
 
-    private void initDefaultHeaderOffset(Rect headerMargins, RecyclerView recyclerView, View header, View firstView, int orientation, boolean isSticky) {
+    private void initDefaultHeaderOffset(Rect headerMargins, RecyclerView recyclerView, View header, @NonNull View firstView, int orientation, boolean isSticky) {
         int translationX, translationY;
         mDimensionCalculator.initMargins(mTempRect1, header);
 
@@ -153,7 +154,7 @@ public class HeaderPositionCalculator {
 
         boolean isReverseLayout = LayoutManagerUtil.isReverseLayout(recyclerView);
         if (firstViewUnderHeaderPosition > 0 && hasNewHeader(firstViewUnderHeaderPosition, isReverseLayout)) {
-            View nextHeader = mHeaderProvider.getHeader(recyclerView, firstViewUnderHeaderPosition);
+            View nextHeader = mHeaderViewCache.getHeader(recyclerView, firstViewUnderHeaderPosition);
             mDimensionCalculator.initMargins(mTempRect1, nextHeader);
             mDimensionCalculator.initMargins(mTempRect2, stickyHeader);
 
@@ -200,7 +201,7 @@ public class HeaderPositionCalculator {
      * @param parent Recyclerview containing all the list items
      * @return first item that is fully beneath a header
      */
-    private View getFirstViewUnobscuredByHeader(RecyclerView parent, View firstHeader) {
+    private View getFirstViewUnobscuredByHeader(@NonNull RecyclerView parent, @NonNull View firstHeader) {
         boolean isReverseLayout = LayoutManagerUtil.isReverseLayout(parent);
         int step = isReverseLayout? -1 : 1;
         int from = isReverseLayout? parent.getChildCount()-1 : 0;
@@ -223,12 +224,12 @@ public class HeaderPositionCalculator {
      * @param orientation of the {@link RecyclerView}
      * @return true if the item view is obscured by the header view
      */
-    private boolean itemIsObscuredByHeader(RecyclerView parent, View item, View header, int orientation) {
+    private boolean itemIsObscuredByHeader(@NonNull RecyclerView parent, @NonNull View item, View header, int orientation) {
         RecyclerView.LayoutParams layoutParams = (RecyclerView.LayoutParams) item.getLayoutParams();
         mDimensionCalculator.initMargins(mTempRect1, header);
 
         int adapterPosition = parent.getChildAdapterPosition(item);
-        if (adapterPosition == RecyclerView.NO_POSITION || mHeaderProvider.getHeader(parent, adapterPosition) != header) {
+        if (adapterPosition == RecyclerView.NO_POSITION || mHeaderViewCache.getHeader(parent, adapterPosition) != header) {
             // Resolves https://github.com/timehop/sticky-headers-recyclerview/issues/36
             // Handles an edge case where a trailing header is smaller than the current sticky header.
             return false;
@@ -251,7 +252,7 @@ public class HeaderPositionCalculator {
         return true;
     }
 
-    private int getListTop(RecyclerView view) {
+    private int getListTop(@NonNull RecyclerView view) {
         if (view.getLayoutManager().getClipToPadding()) {
             return view.getPaddingTop();
         } else {
@@ -259,7 +260,7 @@ public class HeaderPositionCalculator {
         }
     }
 
-    private int getListLeft(RecyclerView view) {
+    private int getListLeft(@NonNull RecyclerView view) {
         if (view.getLayoutManager().getClipToPadding()) {
             return view.getPaddingLeft();
         } else {

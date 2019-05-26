@@ -1,5 +1,6 @@
 package cc.brainbook.android.headerdecoration;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -16,7 +17,7 @@ public class HeaderTouchListener implements RecyclerView.OnItemTouchListener {
         void onHeaderClick(View header, int position, long headerId);
     }
 
-    public HeaderTouchListener(final RecyclerView recyclerView,
+    public HeaderTouchListener(@NonNull final RecyclerView recyclerView,
                                final HeaderDecoration decor) {
         mGestureDetector = new GestureDetector(recyclerView.getContext(), new SingleTapDetector());
         mRecyclerView = recyclerView;
@@ -39,7 +40,7 @@ public class HeaderTouchListener implements RecyclerView.OnItemTouchListener {
     }
 
     @Override
-    public boolean onInterceptTouchEvent(RecyclerView view, MotionEvent e) {
+    public boolean onInterceptTouchEvent(@NonNull RecyclerView view, @NonNull MotionEvent e) {
         if (this.mOnHeaderClickListener != null) {
             boolean tapDetectorResponse = this.mGestureDetector.onTouchEvent(e);
             if (tapDetectorResponse) {
@@ -55,7 +56,7 @@ public class HeaderTouchListener implements RecyclerView.OnItemTouchListener {
     }
 
     @Override
-    public void onTouchEvent(RecyclerView view, MotionEvent e) { /* do nothing? */ }
+    public void onTouchEvent(@NonNull RecyclerView view, @NonNull MotionEvent e) { /* do nothing? */ }
 
     @Override public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
         // do nothing

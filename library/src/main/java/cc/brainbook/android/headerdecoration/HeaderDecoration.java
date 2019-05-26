@@ -2,12 +2,12 @@ package cc.brainbook.android.headerdecoration;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.View;
 
-import cc.brainbook.android.headerdecoration.caching.HeaderProvider;
 import cc.brainbook.android.headerdecoration.caching.HeaderViewCache;
 import cc.brainbook.android.headerdecoration.calculation.DimensionCalculator;
 import cc.brainbook.android.headerdecoration.rendering.HeaderRenderer;
@@ -25,12 +25,14 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
     }
 
     private final HeaderAdapter mHeaderAdapter;
+    private final DimensionCalculator mDimensionCalculator;
+
     private final ItemVisibilityAdapter mVisibilityAdapter;
     private final SparseArray<Rect> mHeaderRects = new SparseArray<>();
-    private final HeaderProvider mHeaderProvider;
+    private final HeaderViewCache mHeaderViewCache;
     private final HeaderPositionCalculator mHeaderPositionCalculator;
-    private final HeaderRenderer mRenderer;
-    private final DimensionCalculator mDimensionCalculator;
+    private final HeaderRenderer mHeaderRenderer;
+
 
     /**
      * The following field is used as a buffer for internal calculations. Its sole purpose is to avoid
@@ -38,39 +40,59 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
      */
     private final Rect mTempRect = new Rect();
 
-    // TODO: Consider passing in orientation to simplify orientation accounting within calculation
     public HeaderDecoration(HeaderAdapter headerAdapter) {
-        this(headerAdapter, new DimensionCalculator(), null);
+        this(headerAdapter,
+                new DimensionCalculator(),
+                null);
     }
 
-    public HeaderDecoration(HeaderAdapter headerAdapter, ItemVisibilityAdapter visibilityAdapter) {
-        this(headerAdapter, new DimensionCalculator(), visibilityAdapter);
-    }
-
-    private HeaderDecoration(HeaderAdapter headerAdapter, DimensionCalculator dimensionCalculator, ItemVisibilityAdapter visibilityAdapter) {
-        this(headerAdapter, dimensionCalculator, new HeaderRenderer(),
-                new HeaderViewCache(headerAdapter), visibilityAdapter);
+    public HeaderDecoration(HeaderAdapter headerAdapter,
+                            ItemVisibilityAdapter visibilityAdapter) {
+        this(headerAdapter,
+                new DimensionCalculator(),
+                visibilityAdapter);
     }
 
     private HeaderDecoration(HeaderAdapter headerAdapter,
-                             DimensionCalculator dimensionCalculator, HeaderRenderer headerRenderer, HeaderProvider headerProvider, ItemVisibilityAdapter visibilityAdapter) {
-        this(headerAdapter, headerRenderer, dimensionCalculator, headerProvider,
-                new HeaderPositionCalculator(headerAdapter, headerProvider, dimensionCalculator), visibilityAdapter);
+                             DimensionCalculator dimensionCalculator,
+                             ItemVisibilityAdapter visibilityAdapter) {
+        this(headerAdapter,
+                dimensionCalculator,
+                visibilityAdapter,
+                new HeaderRenderer(),
+                new HeaderViewCache(headerAdapter));
     }
 
-    private HeaderDecoration(HeaderAdapter headerAdapter, HeaderRenderer headerRenderer,
-                             DimensionCalculator dimensionCalculator, HeaderProvider headerProvider,
-                             HeaderPositionCalculator headerPositionCalculator, ItemVisibilityAdapter visibilityAdapter) {
+    private HeaderDecoration(HeaderAdapter headerAdapter,
+                             DimensionCalculator dimensionCalculator,
+                             ItemVisibilityAdapter visibilityAdapter,
+                             HeaderRenderer headerRenderer,
+                             HeaderViewCache headerViewCache) {
+        this(headerAdapter,
+                dimensionCalculator,
+                visibilityAdapter,
+                headerRenderer,
+                headerViewCache,
+                new HeaderPositionCalculator(headerAdapter, headerViewCache, dimensionCalculator));
+    }
+
+    private HeaderDecoration(HeaderAdapter headerAdapter,
+                             DimensionCalculator dimensionCalculator,
+                             ItemVisibilityAdapter visibilityAdapter,
+                             HeaderRenderer headerRenderer,
+                             HeaderViewCache headerViewCache,
+                             HeaderPositionCalculator headerPositionCalculator) {
         mHeaderAdapter = headerAdapter;
-        mHeaderProvider = headerProvider;
-        mRenderer = headerRenderer;
         mDimensionCalculator = dimensionCalculator;
-        mHeaderPositionCalculator = headerPositionCalculator;
         mVisibilityAdapter = visibilityAdapter;
+        mHeaderRenderer = headerRenderer;
+        mHeaderViewCache = headerViewCache;
+        mHeaderPositionCalculator = headerPositionCalculator;
+
     }
 
     @Override
-    public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+    public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
         super.getItemOffsets(outRect, view, parent, state);
         int itemPosition = parent.getChildAdapterPosition(view);
         if (itemPosition == RecyclerView.NO_POSITION) {
@@ -99,7 +121,7 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
     }
 
     @Override
-    public void onDrawOver(Canvas canvas, RecyclerView parent, RecyclerView.State state) {
+    public void onDrawOver(@NonNull Canvas canvas, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
         super.onDrawOver(canvas, parent, state);
 
         final int childCount = parent.getChildCount();
@@ -116,7 +138,7 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
 
             boolean hasStickyHeader = mHeaderPositionCalculator.hasStickyHeader(itemView, LayoutManagerUtil.getOrientation(parent), position);
             if (hasStickyHeader || mHeaderPositionCalculator.hasNewHeader(position, LayoutManagerUtil.isReverseLayout(parent))) {
-                View header = mHeaderProvider.getHeader(parent, position);
+                View header = mHeaderViewCache.getHeader(parent, position);
                 //re-use existing Rect, if any.
                 Rect headerOffset = mHeaderRects.get(position);
                 if (headerOffset == null) {
@@ -124,7 +146,7 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
                     mHeaderRects.put(position, headerOffset);
                 }
                 mHeaderPositionCalculator.initHeaderBounds(headerOffset, parent, header, itemView, hasStickyHeader, isSticky);
-                mRenderer.drawHeader(parent, canvas, header, headerOffset);
+                mHeaderRenderer.drawHeader(parent, canvas, header, headerOffset);
             }
         }
     }
@@ -158,7 +180,7 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
      * @return HeaderAdapter view
      */
     public View getHeaderView(RecyclerView parent, int position) {
-        return mHeaderProvider.getHeader(parent, position);
+        return mHeaderViewCache.getHeader(parent, position);
     }
 
     /**
@@ -178,7 +200,7 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
      * calling this method.
      */
     public void invalidateHeaders() {
-        mHeaderProvider.invalidate();
+        mHeaderViewCache.invalidate();
         mHeaderRects.clear();
     }
 }

@@ -9,10 +9,7 @@ import android.view.ViewGroup;
 import cc.brainbook.android.headerdecoration.HeaderAdapter;
 import cc.brainbook.android.headerdecoration.util.LayoutManagerUtil;
 
-/**
- * An implementation of {@link HeaderProvider} that creates and caches header views
- */
-public class HeaderViewCache implements HeaderProvider {
+public class HeaderViewCache {
 
     private final HeaderAdapter mAdapter;
     private final LongSparseArray<View> mHeaderViews = new LongSparseArray<>();
@@ -21,14 +18,20 @@ public class HeaderViewCache implements HeaderProvider {
         mAdapter = adapter;
     }
 
-    @Override
-    public View getHeader(RecyclerView parent, int position) {
+    /**
+     * Will provide a header view for a given position in the RecyclerView
+     *
+     * @param recyclerView that will display the header
+     * @param position     that will be headed by the header
+     * @return a header view for the given position and list
+     */
+    public View getHeader(RecyclerView recyclerView, int position) {
         long headerId = mAdapter.getHeaderId(position);
 
         View header = mHeaderViews.get(headerId);
         if (header == null) {
             //TODO - recycle views
-            RecyclerView.ViewHolder viewHolder = mAdapter.onCreateHeaderViewHolder(parent);
+            RecyclerView.ViewHolder viewHolder = mAdapter.onCreateHeaderViewHolder(recyclerView);
             mAdapter.onBindHeaderViewHolder(viewHolder, position);
             header = viewHolder.itemView;
             if (header.getLayoutParams() == null) {
@@ -39,18 +42,18 @@ public class HeaderViewCache implements HeaderProvider {
             int widthSpec;
             int heightSpec;
 
-            if (LayoutManagerUtil.getOrientation(parent) == LinearLayoutManager.VERTICAL) {
-                widthSpec = View.MeasureSpec.makeMeasureSpec(parent.getWidth(), View.MeasureSpec.EXACTLY);
-                heightSpec = View.MeasureSpec.makeMeasureSpec(parent.getHeight(), View.MeasureSpec.UNSPECIFIED);
+            if (LayoutManagerUtil.getOrientation(recyclerView) == LinearLayoutManager.VERTICAL) {
+                widthSpec = View.MeasureSpec.makeMeasureSpec(recyclerView.getWidth(), View.MeasureSpec.EXACTLY);
+                heightSpec = View.MeasureSpec.makeMeasureSpec(recyclerView.getHeight(), View.MeasureSpec.UNSPECIFIED);
             } else {
-                widthSpec = View.MeasureSpec.makeMeasureSpec(parent.getWidth(), View.MeasureSpec.UNSPECIFIED);
-                heightSpec = View.MeasureSpec.makeMeasureSpec(parent.getHeight(), View.MeasureSpec.EXACTLY);
+                widthSpec = View.MeasureSpec.makeMeasureSpec(recyclerView.getWidth(), View.MeasureSpec.UNSPECIFIED);
+                heightSpec = View.MeasureSpec.makeMeasureSpec(recyclerView.getHeight(), View.MeasureSpec.EXACTLY);
             }
 
             int childWidth = ViewGroup.getChildMeasureSpec(widthSpec,
-                    parent.getPaddingLeft() + parent.getPaddingRight(), header.getLayoutParams().width);
+                    recyclerView.getPaddingLeft() + recyclerView.getPaddingRight(), header.getLayoutParams().width);
             int childHeight = ViewGroup.getChildMeasureSpec(heightSpec,
-                    parent.getPaddingTop() + parent.getPaddingBottom(), header.getLayoutParams().height);
+                    recyclerView.getPaddingTop() + recyclerView.getPaddingBottom(), header.getLayoutParams().height);
             header.measure(childWidth, childHeight);
             header.layout(0, 0, header.getMeasuredWidth(), header.getMeasuredHeight());
             mHeaderViews.put(headerId, header);
@@ -58,7 +61,9 @@ public class HeaderViewCache implements HeaderProvider {
         return header;
     }
 
-    @Override
+    /**
+     * Invalidates cached header views.
+     */
     public void invalidate() {
         mHeaderViews.clear();
     }

@@ -1,5 +1,6 @@
 package cc.brainbook.android.headerdecoration.util;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -7,7 +8,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 
 public class LayoutManagerUtil {
 
-    public static int getOrientation(RecyclerView recyclerView) {
+    public static int getOrientation(@NonNull RecyclerView recyclerView) {
         final RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
 
         if (layoutManager instanceof GridLayoutManager) {
@@ -21,7 +22,7 @@ public class LayoutManagerUtil {
         throw new IllegalStateException("Not valid LayoutManager.");
     }
 
-    public static boolean isReverseLayout(RecyclerView recyclerView) {
+    public static boolean isReverseLayout(@NonNull RecyclerView recyclerView) {
         final RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
 
         if (layoutManager instanceof GridLayoutManager) {
