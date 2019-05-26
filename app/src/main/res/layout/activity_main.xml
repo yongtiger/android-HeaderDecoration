@@ -14,37 +14,37 @@
         android:paddingTop="18dp">
 
         <Button
-            android:id="@+id/button_update"
+            android:id="@+id/btn_update"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/button_update" />
 
         <ToggleButton
-            android:id="@+id/button_is_reverse"
+            android:id="@+id/tb_reverse"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textOff="@string/button_reverse"
             android:textOn="@string/button_reverse" />
 
-        <!--///[Show/Hide Header]-->
+        <!--///[Show/Hide HeaderAdapter]-->
         <ToggleButton
-            android:id="@+id/button_is_show_header"
+            android:id="@+id/tb_show_header"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textOff="Hide Header"
-            android:textOn="Show Header" />
+            android:textOff="@string/hide_header"
+            android:textOn="@string/show_header" />
 
         <!--///[isSticky]-->
         <ToggleButton
-            android:id="@+id/button_is_sticky"
+            android:id="@+id/tb_sticky"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textOff="Disable Sticky"
-            android:textOn="Enable Sticky" />
+            android:textOff="@string/disable_sticky"
+            android:textOn="@string/enable_sticky" />
 
     </LinearLayout>
 

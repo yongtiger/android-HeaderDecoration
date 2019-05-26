@@ -7,16 +7,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import cc.brainbook.android.headerdecoration.caching.HeaderProvider;
 import cc.brainbook.android.headerdecoration.calculation.DimensionCalculator;
-import cc.brainbook.android.headerdecoration.util.OrientationProvider;
+import cc.brainbook.android.headerdecoration.util.LayoutManagerUtil;
 
 /**
  * Calculates the position and location of header views
  */
 public class HeaderPositionCalculator {
 
-    private final StickyRecyclerHeadersAdapter mAdapter;
-    private final OrientationProvider mOrientationProvider;
+    private final HeaderAdapter mHeaderAdapter;
     private final HeaderProvider mHeaderProvider;
     private final DimensionCalculator mDimensionCalculator;
 
@@ -27,11 +27,10 @@ public class HeaderPositionCalculator {
     private final Rect mTempRect1 = new Rect();
     private final Rect mTempRect2 = new Rect();
 
-    public HeaderPositionCalculator(StickyRecyclerHeadersAdapter adapter, HeaderProvider headerProvider,
-                                    OrientationProvider orientationProvider, DimensionCalculator dimensionCalculator) {
-        mAdapter = adapter;
+    public HeaderPositionCalculator(HeaderAdapter headerAdapter, HeaderProvider headerProvider,
+                                    DimensionCalculator dimensionCalculator) {
+        mHeaderAdapter = headerAdapter;
         mHeaderProvider = headerProvider;
-        mOrientationProvider = orientationProvider;
         mDimensionCalculator = dimensionCalculator;
     }
 
@@ -57,7 +56,7 @@ public class HeaderPositionCalculator {
             margin = mTempRect1.left;
         }
 
-        return offset <= margin && mAdapter.getHeaderId(position) >= 0;
+        return offset <= margin && mHeaderAdapter.getHeaderId(position) >= 0;
     }
 
     /**
@@ -73,7 +72,7 @@ public class HeaderPositionCalculator {
             return false;
         }
 
-        long headerId = mAdapter.getHeaderId(position);
+        long headerId = mHeaderAdapter.getHeaderId(position);
 
         if (headerId < 0) {
             return false;
@@ -82,26 +81,26 @@ public class HeaderPositionCalculator {
         long nextItemHeaderId = -1;
         int nextItemPosition = position + (isReverseLayout? 1: -1);
         if (!indexOutOfBounds(nextItemPosition)){
-            nextItemHeaderId = mAdapter.getHeaderId(nextItemPosition);
+            nextItemHeaderId = mHeaderAdapter.getHeaderId(nextItemPosition);
         }
-        int firstItemPosition = isReverseLayout? mAdapter.getItemCount()-1 : 0;
+        int firstItemPosition = isReverseLayout? ((RecyclerView.Adapter) mHeaderAdapter).getItemCount()-1 : 0;
 
         return position == firstItemPosition || headerId != nextItemHeaderId;
     }
 
     private boolean indexOutOfBounds(int position) {
-        return position < 0 || position >= mAdapter.getItemCount();
+        return position < 0 || position >= ((RecyclerView.Adapter) mHeaderAdapter).getItemCount();
     }
 
     public void initHeaderBounds(Rect bounds, RecyclerView recyclerView, View header, View firstView, boolean firstHeader, boolean isSticky) {
-        int orientation = mOrientationProvider.getOrientation(recyclerView);
+        int orientation = LayoutManagerUtil.getOrientation(recyclerView);
         initDefaultHeaderOffset(bounds, recyclerView, header, firstView, orientation, isSticky);
 
         if (firstHeader && isStickyHeaderBeingPushedOffscreen(recyclerView, header)) {
             View viewAfterNextHeader = getFirstViewUnobscuredByHeader(recyclerView, header);
             int firstViewUnderHeaderPosition = recyclerView.getChildAdapterPosition(viewAfterNextHeader);
             View secondHeader = mHeaderProvider.getHeader(recyclerView, firstViewUnderHeaderPosition);
-            translateHeaderWithNextHeader(recyclerView, mOrientationProvider.getOrientation(recyclerView), bounds,
+            translateHeaderWithNextHeader(recyclerView, LayoutManagerUtil.getOrientation(recyclerView), bounds,
                     header, viewAfterNextHeader, secondHeader);
         }
     }
@@ -152,13 +151,13 @@ public class HeaderPositionCalculator {
             return false;
         }
 
-        boolean isReverseLayout = mOrientationProvider.isReverseLayout(recyclerView);
+        boolean isReverseLayout = LayoutManagerUtil.isReverseLayout(recyclerView);
         if (firstViewUnderHeaderPosition > 0 && hasNewHeader(firstViewUnderHeaderPosition, isReverseLayout)) {
             View nextHeader = mHeaderProvider.getHeader(recyclerView, firstViewUnderHeaderPosition);
             mDimensionCalculator.initMargins(mTempRect1, nextHeader);
             mDimensionCalculator.initMargins(mTempRect2, stickyHeader);
 
-            if (mOrientationProvider.getOrientation(recyclerView) == LinearLayoutManager.VERTICAL) {
+            if (LayoutManagerUtil.getOrientation(recyclerView) == LinearLayoutManager.VERTICAL) {
                 int topOfNextHeader = viewAfterHeader.getTop() - mTempRect1.bottom - nextHeader.getHeight() - mTempRect1.top;
                 int bottomOfThisHeader = recyclerView.getPaddingTop() + stickyHeader.getBottom() + mTempRect2.top + mTempRect2.bottom;
                 if (topOfNextHeader < bottomOfThisHeader) {
@@ -202,12 +201,12 @@ public class HeaderPositionCalculator {
      * @return first item that is fully beneath a header
      */
     private View getFirstViewUnobscuredByHeader(RecyclerView parent, View firstHeader) {
-        boolean isReverseLayout = mOrientationProvider.isReverseLayout(parent);
+        boolean isReverseLayout = LayoutManagerUtil.isReverseLayout(parent);
         int step = isReverseLayout? -1 : 1;
         int from = isReverseLayout? parent.getChildCount()-1 : 0;
         for (int i = from; i >= 0 && i <= parent.getChildCount() - 1; i += step) {
             View child = parent.getChildAt(i);
-            if (!itemIsObscuredByHeader(parent, child, firstHeader, mOrientationProvider.getOrientation(parent))) {
+            if (!itemIsObscuredByHeader(parent, child, firstHeader, LayoutManagerUtil.getOrientation(parent))) {
                 return child;
             }
         }

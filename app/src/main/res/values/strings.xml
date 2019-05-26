@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">android-HeaderDecoration</string>
-    <string name="button_update">Start Update</string>
+    <string name="button_update">Start update</string>
     <string name="button_reverse">Is reverse</string>
+    <string name="hide_header">Hide header</string>
+    <string name="show_header">Show header</string>
+    <string name="disable_sticky">Disable sticky</string>
+    <string name="enable_sticky">Enable sticky</string>
 </resources>

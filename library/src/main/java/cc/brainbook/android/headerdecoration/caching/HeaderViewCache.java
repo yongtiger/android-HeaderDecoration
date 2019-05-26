@@ -6,22 +6,19 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
-import cc.brainbook.android.headerdecoration.StickyRecyclerHeadersAdapter;
-import cc.brainbook.android.headerdecoration.util.OrientationProvider;
+import cc.brainbook.android.headerdecoration.HeaderAdapter;
+import cc.brainbook.android.headerdecoration.util.LayoutManagerUtil;
 
 /**
  * An implementation of {@link HeaderProvider} that creates and caches header views
  */
 public class HeaderViewCache implements HeaderProvider {
 
-    private final StickyRecyclerHeadersAdapter mAdapter;
+    private final HeaderAdapter mAdapter;
     private final LongSparseArray<View> mHeaderViews = new LongSparseArray<>();
-    private final OrientationProvider mOrientationProvider;
 
-    public HeaderViewCache(StickyRecyclerHeadersAdapter adapter,
-                           OrientationProvider orientationProvider) {
+    public HeaderViewCache(HeaderAdapter adapter) {
         mAdapter = adapter;
-        mOrientationProvider = orientationProvider;
     }
 
     @Override
@@ -42,7 +39,7 @@ public class HeaderViewCache implements HeaderProvider {
             int widthSpec;
             int heightSpec;
 
-            if (mOrientationProvider.getOrientation(parent) == LinearLayoutManager.VERTICAL) {
+            if (LayoutManagerUtil.getOrientation(parent) == LinearLayoutManager.VERTICAL) {
                 widthSpec = View.MeasureSpec.makeMeasureSpec(parent.getWidth(), View.MeasureSpec.EXACTLY);
                 heightSpec = View.MeasureSpec.makeMeasureSpec(parent.getHeight(), View.MeasureSpec.UNSPECIFIED);
             } else {

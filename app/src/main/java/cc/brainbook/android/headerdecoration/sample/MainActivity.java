@@ -16,24 +16,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.security.SecureRandom;
 
-import cc.brainbook.android.headerdecoration.StickyRecyclerHeadersAdapter;
-import cc.brainbook.android.headerdecoration.StickyRecyclerHeadersDecoration;
+import cc.brainbook.android.headerdecoration.HeaderAdapter;
+import cc.brainbook.android.headerdecoration.HeaderDecoration;
+import cc.brainbook.android.headerdecoration.HeaderTouchListener;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "TAG";
 
     private Button mUpdateButton;
-    private ToggleButton mIsReverseButton;
-    private ToggleButton mIsShowHeaderButton;
-    private ToggleButton mIsStickyButton;
+    private ToggleButton mReverseToggleButton;
+    private ToggleButton mShowHeaderToggleButton;
+    private ToggleButton mStickyToggleButton;
 
     private RecyclerView mRecyclerView;
-    private AnimalsHeadersAdapter mAdapter;
-    private StickyRecyclerHeadersDecoration mHeadersDecor;
+    private AnimalsHeadersAdapter mAnimalsHeadersAdapter;
+    private HeaderDecoration mHeaderDecoration;
 
     private RecyclerView.LayoutManager mLayoutManager;
 
@@ -47,18 +49,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        // Set mUpdateButton to update all views one after another (Test for the "Dance")
-        mUpdateButton = (Button) findViewById(R.id.button_update);
+        // Set update button to update all views one after another (Test for the "Dance")
+        mUpdateButton = (Button) findViewById(R.id.btn_update);
         mUpdateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Handler handler = new Handler(Looper.getMainLooper());
-                for (int i = 0; i < mAdapter.getItemCount(); i++) {
+                for (int i = 0; i < mAnimalsHeadersAdapter.getItemCount(); i++) {
                     final int index = i;
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            mAdapter.notifyItemChanged(index);
+                            mAnimalsHeadersAdapter.notifyItemChanged(index);
                         }
                     }, 50);
                 }
@@ -66,12 +68,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         ///[isReverse]
-        mIsReverseButton = (ToggleButton) findViewById(R.id.button_is_reverse);
-        mIsReverseButton.setOnClickListener(new View.OnClickListener() {
+        mReverseToggleButton = (ToggleButton) findViewById(R.id.tb_reverse);
+        mReverseToggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean isChecked = mIsReverseButton.isChecked();
-                mIsReverseButton.setChecked(isChecked);
+                boolean isChecked = mReverseToggleButton.isChecked();
+                mReverseToggleButton.setChecked(isChecked);
 
                 if (mLayoutManager instanceof GridLayoutManager) {
                     ((GridLayoutManager) mLayoutManager).setReverseLayout(isChecked);
@@ -81,101 +83,101 @@ public class MainActivity extends AppCompatActivity {
                     ((StaggeredGridLayoutManager) mLayoutManager).setReverseLayout(isChecked);
                 }
 
-                mAdapter.notifyDataSetChanged();
+                mAnimalsHeadersAdapter.notifyDataSetChanged();
             }
         });
 
         ///[isShowHeader]
-        mIsShowHeaderButton = (ToggleButton) findViewById(R.id.button_is_show_header);
-        mIsShowHeaderButton.setOnClickListener(new View.OnClickListener() {
+        mShowHeaderToggleButton = (ToggleButton) findViewById(R.id.tb_show_header);
+        mShowHeaderToggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean isChecked = mIsShowHeaderButton.isChecked();
-                mIsShowHeaderButton.setChecked(isChecked);
+                boolean isChecked = mShowHeaderToggleButton.isChecked();
+                mShowHeaderToggleButton.setChecked(isChecked);
 
                 if (isChecked) {
-                    mRecyclerView.removeItemDecoration(mHeadersDecor);
+                    mRecyclerView.removeItemDecoration(mHeaderDecoration);
                 } else {
-                    mRecyclerView.addItemDecoration(mHeadersDecor);
+                    mRecyclerView.addItemDecoration(mHeaderDecoration);
                 }
             }
         });
 
         ///[isSticky]
-        mIsStickyButton = (ToggleButton) findViewById(R.id.button_is_sticky);
-        mIsStickyButton.setOnClickListener(new View.OnClickListener() {
+        mStickyToggleButton = (ToggleButton) findViewById(R.id.tb_sticky);
+        mStickyToggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean isChecked = mIsStickyButton.isChecked();
-                mIsStickyButton.setChecked(isChecked);
+                boolean isChecked = mStickyToggleButton.isChecked();
+                mStickyToggleButton.setChecked(isChecked);
 
                 if (isChecked) {
-                    mHeadersDecor.isSticky(false);
+                    mHeaderDecoration.isSticky(false);
                 } else {
-                    mHeadersDecor.isSticky(true);
+                    mHeaderDecoration.isSticky(true);
                 }
             }
         });
     }
 
     private void initRecyclerView() {
-        // Set mAdapter populated with example dummy data
-        mAdapter = new AnimalsHeadersAdapter();
-        mAdapter.addAll(getDummyDataSet());
+        // Set adapter populated with example dummy data
+        mAnimalsHeadersAdapter = new AnimalsHeadersAdapter();
+        mAnimalsHeadersAdapter.addAll(getDummyDataSet());
 
-        // Set mRecyclerView
+        // Set recyclerView
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview);
-        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setAdapter(mAnimalsHeadersAdapter);
 
-        // Set mRecyclerView layout manager
+        // Set recyclerView layout manager
         int orientation = getLayoutManagerOrientation(getResources().getConfiguration().orientation);
-        mLayoutManager = new LinearLayoutManager(this, orientation, mIsReverseButton.isChecked());
+        mLayoutManager = new LinearLayoutManager(this, orientation, mReverseToggleButton.isChecked());
 //        ///[GridLayoutManager]
-//        mLayoutManager = new GridLayoutManager(this, 4, orientation, mIsReverseButton.isChecked());
+//        mLayoutManager = new GridLayoutManager(this, 4, orientation, mReverseToggleButton.isChecked());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // Add header decoration
-        mHeadersDecor = new StickyRecyclerHeadersDecoration(mAdapter);
+        mHeaderDecoration = new HeaderDecoration(mAnimalsHeadersAdapter);
 //        ///[GridLayoutManager]StickyRecyclerGridHeadersDecoration
-//        final StickyRecyclerGridHeadersDecoration mHeadersDecor = new StickyRecyclerGridHeadersDecoration(mAdapter, layoutManager.getSpanCount());
-        mRecyclerView.addItemDecoration(mHeadersDecor);
+//        final StickyRecyclerGridHeadersDecoration mHeaderDecoration = new StickyRecyclerGridHeadersDecoration(mAnimalsHeadersAdapter, layoutManager.getSpanCount());
+        mRecyclerView.addItemDecoration(mHeaderDecoration);
 
         // Add divider decoration
         mRecyclerView.addItemDecoration(new DividerDecoration(this));
 
         //////?????[GridLayoutManager]StickyRecyclerGridHeadersDecoration
-//        // Add touch listeners
-//        StickyRecyclerHeadersTouchListener touchListener =
-//                new StickyRecyclerHeadersTouchListener(mRecyclerView, mHeadersDecor);
-//        touchListener.setOnHeaderClickListener(
-//                new StickyRecyclerHeadersTouchListener.OnHeaderClickListener() {
-//                    @Override
-//                    public void onHeaderClick(View header, int position, long headerId) {
-//                        Toast.makeText(MainActivity.this, "Header position: " + position + ", id: " + headerId,
-//                                Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//        mRecyclerView.addOnItemTouchListener(touchListener);
-//        ///[Disable Header's OnItemTouchListener]
-////        mRecyclerView.removeOnItemTouchListener(touchListener);
-////        touchListener.setOnHeaderClickListener(null); ///alternative
+        // Add touch listeners
+        HeaderTouchListener headerTouchListener =
+                new HeaderTouchListener(mRecyclerView, mHeaderDecoration);
+        headerTouchListener.setOnHeaderClickListener(
+                new HeaderTouchListener.OnHeaderClickListener() {
+                    @Override
+                    public void onHeaderClick(View header, int position, long headerId) {
+                        Toast.makeText(MainActivity.this, "HeaderAdapter position: " + position + ", id: " + headerId,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+        mRecyclerView.addOnItemTouchListener(headerTouchListener);
+        ///[Disable HeaderAdapter's OnItemTouchListener]
+//        mRecyclerView.removeOnItemTouchListener(headerTouchListener);
+//        touchListener.setOnHeaderClickListener(null); ///alternative
 
         //Item's OnItemTouchListener]
-        RecyclerItemClickListener itemClickListener = new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
+        ItemTouchListener itemTouchListener = new ItemTouchListener(this, new ItemTouchListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 Log.d(TAG, "onItemClick: ");
-                mAdapter.remove(mAdapter.getItem(position));
+                mAnimalsHeadersAdapter.remove(mAnimalsHeadersAdapter.getItem(position));
             }
         });
-        mRecyclerView.addOnItemTouchListener(itemClickListener);
+        mRecyclerView.addOnItemTouchListener(itemTouchListener);
         ///[Disable Item's OnItemTouchListener]
-//        mRecyclerView.removeOnItemTouchListener(itemClickListener);
+//        mRecyclerView.removeOnItemTouchListener(itemTouchListener);
 
-        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+        mAnimalsHeadersAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
-                mHeadersDecor.invalidateHeaders();
+                mHeaderDecoration.invalidateHeaders();
             }
         });
 
@@ -194,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class AnimalsHeadersAdapter extends AnimalsAdapter<RecyclerView.ViewHolder>
-            implements StickyRecyclerHeadersAdapter<RecyclerView.ViewHolder> {
+            implements HeaderAdapter<RecyclerView.ViewHolder> {
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext())
@@ -211,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public long getHeaderId(int position) {
-            if (position < 0) { ///[FIX#https://github.com/timehop/sticky-headers-recyclerview/issues/21]
+            if (position < 0) {
                 return -1;
             } else {
                 return getItem(position).charAt(0);
@@ -239,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
                     rgen.nextInt(359), 1, 1
             });
         }
-
     }
+
 }
 

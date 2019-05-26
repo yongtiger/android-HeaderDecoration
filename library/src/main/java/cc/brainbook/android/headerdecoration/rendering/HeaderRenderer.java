@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import cc.brainbook.android.headerdecoration.calculation.DimensionCalculator;
-import cc.brainbook.android.headerdecoration.util.OrientationProvider;
+import cc.brainbook.android.headerdecoration.util.LayoutManagerUtil;
 
 /**
  * Responsible for drawing headers to the canvas provided by the item decoration
@@ -15,7 +15,6 @@ import cc.brainbook.android.headerdecoration.util.OrientationProvider;
 public class HeaderRenderer {
 
     private final DimensionCalculator mDimensionCalculator;
-    private final OrientationProvider mOrientationProvider;
 
     /**
      * The following field is used as a buffer for internal calculations. Its sole purpose is to avoid
@@ -23,13 +22,11 @@ public class HeaderRenderer {
      */
     private final Rect mTempRect = new Rect();
 
-    public HeaderRenderer(OrientationProvider orientationProvider) {
-        this(orientationProvider, new DimensionCalculator());
+    public HeaderRenderer() {
+        this(new DimensionCalculator());
     }
 
-    private HeaderRenderer(OrientationProvider orientationProvider,
-                           DimensionCalculator dimensionCalculator) {
-        mOrientationProvider = orientationProvider;
+    private HeaderRenderer(DimensionCalculator dimensionCalculator) {
         mDimensionCalculator = dimensionCalculator;
     }
 
@@ -70,7 +67,7 @@ public class HeaderRenderer {
      */
     private void initClipRectForHeader(Rect clipRect, RecyclerView recyclerView, View header) {
         mDimensionCalculator.initMargins(clipRect, header);
-        if (mOrientationProvider.getOrientation(recyclerView) == LinearLayout.VERTICAL) {
+        if (LayoutManagerUtil.getOrientation(recyclerView) == LinearLayout.VERTICAL) {
             clipRect.set(
                     recyclerView.getPaddingLeft(),
                     recyclerView.getPaddingTop(),
