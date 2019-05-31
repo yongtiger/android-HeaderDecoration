@@ -3,13 +3,13 @@ package cc.brainbook.android.headerdecoration.interfaces;
 /**
  * ItemVisibilityAdapter provides a way for HeaderDecoration
  * to know if a row is visible or not.  This comes into play if the
- * recyclerview's layout manager  is set up to provide extra layout space (by
+ * layout manager of recycler view is set up to provide extra layout space (by
  * overriding getExtraLayoutSpace). In this case rows that aren't visible (yet)
  * will be bound and HeaderDecoration will need to know which
  * are visible to correctly calculate the row to base the sticky header on
  *
  * To use it you must pass an instance of a class that implements this
- * interface as a second argment HeaderDecoration's constructor.
+ * interface as a second argument HeaderDecoration's constructor.
  *
  */
 public interface ItemVisibilityAdapter {

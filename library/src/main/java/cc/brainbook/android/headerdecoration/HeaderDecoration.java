@@ -3,17 +3,18 @@ package cc.brainbook.android.headerdecoration;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseArray;
 import android.view.View;
 
-import cc.brainbook.android.headerdecoration.helper.HeaderPositionCalculator;
-import cc.brainbook.android.headerdecoration.helper.HeaderViewCache;
+import cc.brainbook.android.headerdecoration.helper.HeaderHelper;
+import cc.brainbook.android.headerdecoration.helper.HeaderCache;
+import cc.brainbook.android.headerdecoration.util.AdapterUtil;
 import cc.brainbook.android.headerdecoration.util.DimensionUtil;
 import cc.brainbook.android.headerdecoration.interfaces.HeaderAdapter;
 import cc.brainbook.android.headerdecoration.interfaces.ItemVisibilityAdapter;
-import cc.brainbook.android.headerdecoration.helper.HeaderRenderer;
+import cc.brainbook.android.headerdecoration.util.HeaderUtil;
 import cc.brainbook.android.headerdecoration.util.LayoutManagerUtil;
 
 public class HeaderDecoration extends RecyclerView.ItemDecoration {
@@ -29,85 +30,147 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
 
     private final HeaderAdapter mHeaderAdapter;
     private final ItemVisibilityAdapter mVisibilityAdapter;
-    private final SparseArray<Rect> mHeaderRects = new SparseArray<>();
-    private final HeaderViewCache mHeaderViewCache;
-    private final HeaderPositionCalculator mHeaderPositionCalculator;
-    private final HeaderRenderer mHeaderRenderer;
-
+    private final HeaderCache mHeaderCache;
+    private final HeaderHelper mHeaderHelper;
+    private GridLayoutManager.SpanSizeLookup mSpanSizeLookup;
 
     /**
-     * The following field is used as a buffer for internal calculations. Its sole purpose is to avoid
-     * allocating new Rect every time we need one.
+     * The following field is used as a buffer for internal calculations.
+     * Its sole purpose is to avoid allocating NEW Rect every time we need one.
      */
-    private final Rect mTempRect = new Rect();
+    private final Rect mMarginRect = new Rect();
 
-    public HeaderDecoration(HeaderAdapter headerAdapter) {
+    public HeaderDecoration(HeaderAdapter<RecyclerView.ViewHolder> headerAdapter) {
         this(headerAdapter, null);
     }
 
-    private HeaderDecoration(HeaderAdapter headerAdapter,
+    public HeaderDecoration(HeaderAdapter<RecyclerView.ViewHolder> headerAdapter,
                              ItemVisibilityAdapter visibilityAdapter) {
         this(headerAdapter,
                 visibilityAdapter,
-                new HeaderRenderer(),
-                new HeaderViewCache(headerAdapter));
+                new HeaderCache(headerAdapter));
     }
 
     private HeaderDecoration(HeaderAdapter headerAdapter,
                              ItemVisibilityAdapter visibilityAdapter,
-                             HeaderRenderer headerRenderer,
-                             HeaderViewCache headerViewCache) {
+                             HeaderCache headerViewCache) {
         this(headerAdapter,
                 visibilityAdapter,
-                headerRenderer,
                 headerViewCache,
-                new HeaderPositionCalculator(headerAdapter, headerViewCache));
+                new HeaderHelper(headerAdapter, headerViewCache));
     }
 
     private HeaderDecoration(HeaderAdapter headerAdapter,
                              ItemVisibilityAdapter visibilityAdapter,
-                             HeaderRenderer headerRenderer,
-                             HeaderViewCache headerViewCache,
-                             HeaderPositionCalculator headerPositionCalculator) {
+                             HeaderCache headerViewCache,
+                             HeaderHelper headerPositionCalculator) {
         mHeaderAdapter = headerAdapter;
         mVisibilityAdapter = visibilityAdapter;
-        mHeaderRenderer = headerRenderer;
-        mHeaderViewCache = headerViewCache;
-        mHeaderPositionCalculator = headerPositionCalculator;
+        mHeaderCache = headerViewCache;
+        mHeaderHelper = headerPositionCalculator;
 
     }
 
     @Override
-    public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+    public void getItemOffsets(@NonNull Rect outRect,
+                               @NonNull View view,
+                               @NonNull final RecyclerView parent,
+                               @NonNull RecyclerView.State state) {
         super.getItemOffsets(outRect, view, parent, state);
-        int itemPosition = parent.getChildAdapterPosition(view);
+        final int itemPosition = parent.getChildAdapterPosition(view);
         if (itemPosition == RecyclerView.NO_POSITION) {
             return;
         }
-        if (mHeaderPositionCalculator.hasNewHeader(itemPosition, LayoutManagerUtil.isReverseLayout(parent))) {
-            View header = getHeaderView(parent, itemPosition);
+        if (AdapterUtil.hasNewHeader(mHeaderAdapter, itemPosition, LayoutManagerUtil.getReverseLayout(parent))) {
+            final View header = getHeaderView(parent, itemPosition);
             setItemOffsetsForHeader(outRect, header, LayoutManagerUtil.getOrientation(parent));
+        }
+
+        ///[GridLayoutManager]
+        ///https://blog.csdn.net/qian520ao/article/details/76167193
+        if (parent.getLayoutManager() instanceof GridLayoutManager) {
+            final GridLayoutManager gridLayoutManager = (GridLayoutManager) parent.getLayoutManager();
+            if (gridLayoutManager != null) {
+                if (mSpanSizeLookup == null) {
+                    mSpanSizeLookup = new GridLayoutManager.SpanSizeLookup() {
+                        @Override
+                        public int getSpanSize(int position) {
+                            ///每组header的最后一个元素要补齐span为占满整行（无论是否Grid reverse）
+                            ///注意：无论是否Grid reverse，每行都是从左到右依次递增的！
+                            final int headerItemPosition = LayoutManagerUtil.getReverseLayout(parent) ? position :
+                                    AdapterUtil.getNextItemPosition((RecyclerView.Adapter) mHeaderAdapter, position, false);
+                            if (AdapterUtil.hasNewHeader(mHeaderAdapter, headerItemPosition, LayoutManagerUtil.getReverseLayout(parent))) {
+                                final int headerFirstChildPosition = mHeaderCache.getHeaderFirstChildPosition(position);
+                                return gridLayoutManager.getSpanCount() - ((position - headerFirstChildPosition) % gridLayoutManager.getSpanCount());
+//                                final int headerChildCount = mHeaderCache.getHeaderChildCount(position);
+//                                return LayoutManagerUtil.getSpanCount(parent) - ((headerChildCount - 1) % LayoutManagerUtil.getSpanCount(parent));
+                            } else {
+                                return 1;
+                            }
+                        }
+                    };
+                    gridLayoutManager.setSpanSizeLookup(mSpanSizeLookup);
+                }
+
+                ///设置每组header的第一行所有元素的header偏移量
+                setGridItemOffsetsForHeader(outRect, parent, gridLayoutManager, itemPosition);
+            }
+        }
+    }
+
+    /**
+     * 设置每组header的第一行所有元素的header偏移量
+     *
+     * @param outRect           rectangle to define offsets for the item
+     * @param recyclerView      the parent recycler view for drawing the header into
+     * @param gridLayoutManager GridLayoutManager
+     * @param position          of the list item in questions
+     */
+    private void setGridItemOffsetsForHeader(@NonNull Rect outRect,
+                     @NonNull final RecyclerView recyclerView,
+                     GridLayoutManager gridLayoutManager,
+                     int position) {
+        final int headerFirstChildPosition = mHeaderCache.getHeaderFirstChildPosition(position);
+        if (LayoutManagerUtil.getReverseLayout(recyclerView)) {
+            ///当Grid reverse时，获取header的第一行position，然后设置该行此后所有元素的header偏移量
+            final int headerMultiple = (mHeaderCache.getHeaderChildCount(position) - 1) / gridLayoutManager.getSpanCount();
+            final int headerLineFirstPosition = headerFirstChildPosition + gridLayoutManager.getSpanCount() * headerMultiple;
+            if (position >= headerLineFirstPosition && position < headerLineFirstPosition + gridLayoutManager.getSpanCount()
+                    && mHeaderAdapter.getHeaderId(position) == mHeaderAdapter.getHeaderId(headerLineFirstPosition)
+                    && !AdapterUtil.hasNewHeader(mHeaderAdapter, position, LayoutManagerUtil.getReverseLayout(recyclerView))) {
+                final View header = getHeaderView(recyclerView, headerLineFirstPosition);
+                setItemOffsetsForHeader(outRect, header, LayoutManagerUtil.getOrientation(recyclerView));
+            }
+        } else {
+            ///当Grid不是reverse时，获取header第一个元素的position，然后设置该行此后所有元素的header偏移量
+            if (position > headerFirstChildPosition && position < headerFirstChildPosition + gridLayoutManager.getSpanCount()
+                    && mHeaderAdapter.getHeaderId(position) == mHeaderAdapter.getHeaderId(headerFirstChildPosition)) {
+                final View header = getHeaderView(recyclerView, headerFirstChildPosition);
+                setItemOffsetsForHeader(outRect, header, LayoutManagerUtil.getOrientation(recyclerView));
+            }
         }
     }
 
     /**
      * Sets the offsets for the first item in a section to make room for the header view
      *
-     * @param itemOffsets rectangle to define offsets for the item
-     * @param header      view used to calculate offset for the item
-     * @param orientation used to calculate offset for the item
+     * @param itemOffsets   rectangle to define offsets for the item
+     * @param header        view used to calculate offset for the item
+     * @param orientation   used to calculate offset for the item
      */
     private void setItemOffsetsForHeader(Rect itemOffsets, View header, int orientation) {
-        DimensionUtil.initMargins(mTempRect, header);
+        DimensionUtil.initMargins(mMarginRect, header);
         if (orientation == LinearLayoutManager.VERTICAL) {
-            itemOffsets.top = header.getHeight() + mTempRect.top + mTempRect.bottom;
+            itemOffsets.top = header.getHeight() + mMarginRect.top + mMarginRect.bottom;
         } else {
-            itemOffsets.left = header.getWidth() + mTempRect.left + mTempRect.right;
+            itemOffsets.left = header.getWidth() + mMarginRect.left + mMarginRect.right;
         }
     }
 
     @Override
-    public void onDrawOver(@NonNull Canvas canvas, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+    public void onDrawOver(@NonNull Canvas canvas,
+                           @NonNull RecyclerView parent,
+                           @NonNull RecyclerView.State state) {
         super.onDrawOver(canvas, parent, state);
 
         final int childCount = parent.getChildCount();
@@ -115,78 +178,68 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
             return;
         }
 
+        ///[FIX#点击sticky header时position总为0]
+        mHeaderCache.invalidateHeaderRects();
+
         for (int i = 0; i < childCount; i++) {
-            View itemView = parent.getChildAt(i);
-            int position = parent.getChildAdapterPosition(itemView);
+            final View itemView = parent.getChildAt(i);
+            final int position = parent.getChildAdapterPosition(itemView);
             if (position == RecyclerView.NO_POSITION) {
                 continue;
             }
 
-            boolean hasStickyHeader = mHeaderPositionCalculator.hasStickyHeader(itemView, LayoutManagerUtil.getOrientation(parent), position);
-            if (hasStickyHeader || mHeaderPositionCalculator.hasNewHeader(position, LayoutManagerUtil.isReverseLayout(parent))) {
-                View header = mHeaderViewCache.getHeader(parent, position);
-                //re-use existing Rect, if any.
-                Rect headerOffset = mHeaderRects.get(position);
-                if (headerOffset == null) {
-                    headerOffset = new Rect();
-                    mHeaderRects.put(position, headerOffset);
-                }
-                mHeaderPositionCalculator.initHeaderBounds(headerOffset, parent, header, itemView, hasStickyHeader, isSticky);
-                mHeaderRenderer.drawHeader(parent, canvas, header, headerOffset);
+            ///Note: hasStickyHeader will be true only at the first element in the recycler view.
+            // Otherwise, when GridLayoutManager, it may cause multiple displays to be repeated.
+            final boolean hasStickyHeader = i == (LayoutManagerUtil.getReverseLayout(parent) ? childCount - 1 : 0)
+                    && mHeaderHelper.hasStickyHeader(itemView, LayoutManagerUtil.getOrientation(parent), position, isSticky);
+
+            if (hasStickyHeader || AdapterUtil.hasNewHeader(mHeaderAdapter, position, LayoutManagerUtil.getReverseLayout(parent))) {
+                final View header = mHeaderCache.getHeaderView(parent, position);
+                final Rect headerOffset = mHeaderCache.getHeaderRect(position);
+                mHeaderHelper.initHeaderBounds(headerOffset, parent, header, itemView, hasStickyHeader, isSticky);
+                drawHeader(parent, canvas, header, headerOffset);
             }
         }
     }
 
     /**
-     * Gets the position of the header under the specified (x, y) coordinates.
+     * Draws a header to a canvas, offsetting by some x and y amount
      *
-     * @param x x-coordinate
-     * @param y y-coordinate
-     * @return position of header, or -1 if not found
+     * @param recyclerView the parent recycler view for drawing the header into
+     * @param canvas       the canvas on which to draw the header
+     * @param header       the view to draw as the header
+     * @param offset       a Rect used to define the x/y offset of the header.
+     *                     Specify x/y offset by setting the {@link Rect#left} and {@link Rect#top} properties, respectively.
      */
-    public int findHeaderPositionUnder(int x, int y) {
-        for (int i = 0; i < mHeaderRects.size(); i++) {
-            Rect rect = mHeaderRects.get(mHeaderRects.keyAt(i));
-            if (rect.contains(x, y)) {
-                int position = mHeaderRects.keyAt(i);
-                if (mVisibilityAdapter == null || mVisibilityAdapter.isPositionVisible(position)) {
-                    return position;
-                }
-            }
+    private void drawHeader(@NonNull RecyclerView recyclerView, @NonNull Canvas canvas, View header, Rect offset) {
+        canvas.save();
+
+        if (LayoutManagerUtil.getClipToPadding(recyclerView)) {
+            // Clip drawing of headers to the padding of the RecyclerView. Avoids drawing in the padding
+            HeaderUtil.initClipRectForHeader(mMarginRect, recyclerView, header);
+            canvas.clipRect(mMarginRect);
         }
-        return -1;
+
+        canvas.translate(offset.left, offset.top);
+
+        header.draw(canvas);
+        canvas.restore();
     }
 
-    /**
-     * Gets the header view for the associated position.  If it doesn't exist yet, it will be
-     * created, measured, and laid out.
-     *
-     * @param parent the recyclerview
-     * @param position the position to get the header view for
-     * @return HeaderAdapter view
-     */
     public View getHeaderView(RecyclerView parent, int position) {
-        return mHeaderViewCache.getHeader(parent, position);
+        return mHeaderCache.getHeaderView(parent, position);
+    }
+
+    public int findHeaderPositionUnder(int x, int y) {
+        return mHeaderCache.findHeaderPositionUnder(x, y, mVisibilityAdapter);
     }
 
     /**
-     * Determines if an item in the list should have a header that is different than the item in the
-     * list that immediately precedes it. Items with no headers will always return false.
-     *
-     * @param position of the list item in questions
-     * @param isReverseLayout TRUE if layout manager has flag isReverseLayout
-     * @return true if this item has a different header than the previous item in the list
-     */
-    public boolean hasNewHeader(int position, boolean isReverseLayout) {
-        return mHeaderPositionCalculator.hasNewHeader(position, isReverseLayout);
-    }
-
-    /**
-     * Invalidates cached headers.  This does not invalidate the recyclerview, you should do that manually after
-     * calling this method.
+     * Invalidates cached headers.
+     * This does not invalidate the recycler view, you should do that manually after calling this method.
      */
     public void invalidateHeaders() {
-        mHeaderViewCache.invalidate();
-        mHeaderRects.clear();
+        mHeaderCache.invalidate();
     }
+
 }

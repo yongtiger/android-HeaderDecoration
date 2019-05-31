@@ -22,7 +22,7 @@ public class LayoutManagerUtil {
         throw new IllegalStateException("Not valid LayoutManager.");
     }
 
-    public static boolean isReverseLayout(@NonNull RecyclerView recyclerView) {
+    public static boolean getReverseLayout(@NonNull RecyclerView recyclerView) {
         final RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
 
         if (layoutManager instanceof GridLayoutManager) {
@@ -34,6 +34,19 @@ public class LayoutManagerUtil {
         }
 
         throw new IllegalStateException("Not valid LayoutManager.");
+    }
+
+    public static boolean getClipToPadding(@NonNull RecyclerView recyclerView) {
+        final RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+        return layoutManager != null && layoutManager.getClipToPadding();
+    }
+
+    public static int getListTop(@NonNull RecyclerView recyclerView) {
+        return LayoutManagerUtil.getClipToPadding(recyclerView) ? recyclerView.getPaddingTop() : 0;
+    }
+
+    public static int getListLeft(@NonNull RecyclerView recyclerView) {
+        return LayoutManagerUtil.getClipToPadding(recyclerView) ? recyclerView.getPaddingLeft() : 0;
     }
 
     private LayoutManagerUtil() {}

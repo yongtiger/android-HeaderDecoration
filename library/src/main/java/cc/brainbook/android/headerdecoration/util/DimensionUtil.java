@@ -15,34 +15,23 @@ public class DimensionUtil {
     /**
      * Populates {@link Rect} with margins for any view.
      *
-     * @param margins rect to populate
-     * @param view for which to get margins
+     * @param margins   rect to populate
+     * @param view      for which to get margins
      */
     public static void initMargins(Rect margins, @NonNull View view) {
         final LayoutParams layoutParams = view.getLayoutParams();
 
         if (layoutParams instanceof MarginLayoutParams) {
             final MarginLayoutParams marginLayoutParams = (MarginLayoutParams) layoutParams;
-            initMarginRect(margins, marginLayoutParams);
+            margins.set(
+                    marginLayoutParams.leftMargin,
+                    marginLayoutParams.topMargin,
+                    marginLayoutParams.rightMargin,
+                    marginLayoutParams.bottomMargin
+            );
         } else {
             margins.set(0, 0, 0, 0);
         }
-    }
-
-    /**
-     * Converts {@link MarginLayoutParams} into a representative {@link Rect}.
-     *
-     * @param marginRect Rect to be initialized with margins coordinates, where
-     * {@link MarginLayoutParams#leftMargin} is equivalent to {@link Rect#left}, etc.
-     * @param marginLayoutParams margins to populate the Rect with
-     */
-    private static void initMarginRect(@NonNull Rect marginRect, @NonNull MarginLayoutParams marginLayoutParams) {
-        marginRect.set(
-                marginLayoutParams.leftMargin,
-                marginLayoutParams.topMargin,
-                marginLayoutParams.rightMargin,
-                marginLayoutParams.bottomMargin
-        );
     }
 
     private DimensionUtil() {}

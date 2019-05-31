@@ -6,4 +6,6 @@
     <string name="show_header">Show header</string>
     <string name="disable_sticky">Disable sticky</string>
     <string name="enable_sticky">Enable sticky</string>
+    <string name="linear_layout">Linear layout</string>
+    <string name="grid_layout">Grid layout</string>
 </resources>

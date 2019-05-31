@@ -4,6 +4,7 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -32,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
     private ToggleButton mReverseToggleButton;
     private ToggleButton mShowHeaderToggleButton;
     private ToggleButton mStickyToggleButton;
+    private Button mLinearLayoutButton;
+    private Button mGridLayoutButton;
 
     private RecyclerView mRecyclerView;
     private AnimalsHeadersAdapter mAnimalsHeadersAdapter;
@@ -54,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         mUpdateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Handler handler = new Handler(Looper.getMainLooper());
+                final Handler handler = new Handler(Looper.getMainLooper());
                 for (int i = 0; i < mAnimalsHeadersAdapter.getItemCount(); i++) {
                     final int index = i;
                     handler.postDelayed(new Runnable() {
@@ -72,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         mReverseToggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean isChecked = mReverseToggleButton.isChecked();
+                final boolean isChecked = mReverseToggleButton.isChecked();
                 mReverseToggleButton.setChecked(isChecked);
 
                 if (mLayoutManager instanceof GridLayoutManager) {
@@ -80,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                 } else if (mLayoutManager instanceof LinearLayoutManager) {
                     ((LinearLayoutManager) mLayoutManager).setReverseLayout(isChecked);
                 } else if (mLayoutManager instanceof StaggeredGridLayoutManager) {
-                    ((StaggeredGridLayoutManager) mLayoutManager).setReverseLayout(isChecked);
+                    ((StaggeredGridLayoutManager) mLayoutManager).setReverseLayout(isChecked);  ///not support!
                 }
 
                 mAnimalsHeadersAdapter.notifyDataSetChanged();
@@ -92,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         mShowHeaderToggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean isChecked = mShowHeaderToggleButton.isChecked();
+                final boolean isChecked = mShowHeaderToggleButton.isChecked();
                 mShowHeaderToggleButton.setChecked(isChecked);
 
                 if (isChecked) {
@@ -108,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         mStickyToggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean isChecked = mStickyToggleButton.isChecked();
+                final boolean isChecked = mStickyToggleButton.isChecked();
                 mStickyToggleButton.setChecked(isChecked);
 
                 if (isChecked) {
@@ -116,6 +119,30 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     mHeaderDecoration.isSticky(true);
                 }
+            }
+        });
+
+        ///[LinearLayoutManager]
+        mLinearLayoutButton = (Button) findViewById(R.id.btn_linear_layout);
+        mLinearLayoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Set recyclerView layout manager
+                final int orientation = getLayoutManagerOrientation(getResources().getConfiguration().orientation);
+                mLayoutManager = new LinearLayoutManager(MainActivity.this, orientation, mReverseToggleButton.isChecked());
+                mRecyclerView.setLayoutManager(mLayoutManager);
+            }
+        });
+
+        ///[GridLayoutManager]
+        mGridLayoutButton = (Button) findViewById(R.id.btn_grid_layout);
+        mGridLayoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Set recyclerView layout manager
+                final int orientation = getLayoutManagerOrientation(getResources().getConfiguration().orientation);
+                mLayoutManager = new GridLayoutManager(MainActivity.this, 4, orientation, mReverseToggleButton.isChecked());
+                mRecyclerView.setLayoutManager(mLayoutManager);
             }
         });
     }
@@ -130,30 +157,25 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mAnimalsHeadersAdapter);
 
         // Set recyclerView layout manager
-        int orientation = getLayoutManagerOrientation(getResources().getConfiguration().orientation);
+        final int orientation = getLayoutManagerOrientation(getResources().getConfiguration().orientation);
         mLayoutManager = new LinearLayoutManager(this, orientation, mReverseToggleButton.isChecked());
-//        ///[GridLayoutManager]
-//        mLayoutManager = new GridLayoutManager(this, 4, orientation, mReverseToggleButton.isChecked());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // Add header decoration
         mHeaderDecoration = new HeaderDecoration(mAnimalsHeadersAdapter);
-//        ///[GridLayoutManager]StickyRecyclerGridHeadersDecoration
-//        final StickyRecyclerGridHeadersDecoration mHeaderDecoration = new StickyRecyclerGridHeadersDecoration(mAnimalsHeadersAdapter, layoutManager.getSpanCount());
         mRecyclerView.addItemDecoration(mHeaderDecoration);
 
         // Add divider decoration
         mRecyclerView.addItemDecoration(new DividerDecoration(this));
 
-        //////?????[GridLayoutManager]StickyRecyclerGridHeadersDecoration
         // Add touch listeners
-        HeaderTouchListener headerTouchListener =
+        final HeaderTouchListener headerTouchListener =
                 new HeaderTouchListener(mRecyclerView, mHeaderDecoration);
         headerTouchListener.setOnHeaderClickListener(
                 new HeaderTouchListener.OnHeaderClickListener() {
                     @Override
                     public void onHeaderClick(View header, int position, long headerId) {
-                        Toast.makeText(MainActivity.this, "HeaderAdapter position: " + position + ", id: " + headerId,
+                        Toast.makeText(MainActivity.this, "onHeaderClick# position: " + position + ", id: " + headerId,
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -163,10 +185,11 @@ public class MainActivity extends AppCompatActivity {
 //        touchListener.setOnHeaderClickListener(null); ///alternative
 
         //Item's OnItemTouchListener]
-        ItemTouchListener itemTouchListener = new ItemTouchListener(this, new ItemTouchListener.OnItemClickListener() {
+        final ItemTouchListener itemTouchListener = new ItemTouchListener(this, new ItemTouchListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Log.d(TAG, "onItemClick: ");
+                Log.d(TAG, "onItemClick: position: " + position);
+                Toast.makeText(MainActivity.this, "onItemClick# position: " + position, Toast.LENGTH_SHORT).show();
                 mAnimalsHeadersAdapter.remove(mAnimalsHeadersAdapter.getItem(position));
             }
         });
@@ -183,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @NonNull
     private String[] getDummyDataSet() {
         return getResources().getStringArray(R.array.animals);
     }
@@ -197,17 +221,18 @@ public class MainActivity extends AppCompatActivity {
 
     private class AnimalsHeadersAdapter extends AnimalsAdapter<RecyclerView.ViewHolder>
             implements HeaderAdapter<RecyclerView.ViewHolder> {
+        @NonNull
         @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            final View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.view_item, parent, false);
             return new RecyclerView.ViewHolder(view) {
             };
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-            TextView textView = (TextView) holder.itemView;
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+            final TextView textView = (TextView) holder.itemView;
             textView.setText(getItem(position));
         }
 
@@ -222,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public RecyclerView.ViewHolder onCreateHeaderViewHolder(ViewGroup parent) {
-            View view = LayoutInflater.from(parent.getContext())
+            final View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.view_header, parent, false);
             return new RecyclerView.ViewHolder(view) {
             };
@@ -230,13 +255,13 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBindHeaderViewHolder(RecyclerView.ViewHolder holder, int position) {
-            TextView textView = (TextView) holder.itemView;
+            final TextView textView = (TextView) holder.itemView;
             textView.setText(String.valueOf(getItem(position).charAt(0)));
             holder.itemView.setBackgroundColor(getRandomColor());
         }
 
         private int getRandomColor() {
-            SecureRandom rgen = new SecureRandom();
+            final SecureRandom rgen = new SecureRandom();
             return Color.HSVToColor(150, new float[]{
                     rgen.nextInt(359), 1, 1
             });

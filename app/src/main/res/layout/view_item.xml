@@ -8,6 +8,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="@dimen/small"
+    android:layout_margin="8dp"
     android:textSize="14sp"
     tools:text="Aardvark"
     android:background="@drawable/white_touch"
