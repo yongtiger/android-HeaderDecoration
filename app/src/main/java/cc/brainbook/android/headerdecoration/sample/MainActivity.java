@@ -232,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-            final TextView textView = (TextView) holder.itemView;
+            final TextView textView = (TextView) holder.itemView.findViewById(R.id.tv_text);
             textView.setText(getItem(position));
         }
 
@@ -255,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBindHeaderViewHolder(RecyclerView.ViewHolder holder, int position) {
-            final TextView textView = (TextView) holder.itemView;
+            final TextView textView = (TextView) holder.itemView.findViewById(R.id.tv_text);
             textView.setText(String.valueOf(getItem(position).charAt(0)));
             holder.itemView.setBackgroundColor(getRandomColor());
         }
