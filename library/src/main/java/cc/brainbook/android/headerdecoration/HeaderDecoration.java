@@ -2,7 +2,9 @@ package cc.brainbook.android.headerdecoration;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -242,4 +244,47 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
         mHeaderCache.invalidate();
     }
 
+    ///[UPGRADE#handle click-event in RecyclerView.ItemDecoration]
+    ///https://github.com/edubarr/header-decor/issues/36
+    ///While the real header is scroll off the screen, the visible one is drawing on canvas directly ,not like a normal interactive widget.
+    //
+    //You have these options:
+    //1) Override RecyclerView.onInterceptTouchEvent(), though with some invasiveness so I prefer the next one.
+    //2) Make use of RecyclerView.addOnItemTouchListener(), remember the motion event argument has been translated into RecyclerView's coordinate system.
+    //3) Use a real header view, but that will go a little far I think.
+    /**
+     * Checks if the view on the header is clicked
+     *
+     * @param parent the parent recycler view for drawing the header into
+     * @param x : getX
+     * @param y : getY
+     * @param viewId : resource id of view you clicked.
+     * @return
+     */
+    public boolean isViewClicked(RecyclerView parent, int x, int y, @IdRes int viewId) {
+        final int position = findHeaderPositionUnder(x, y);
+        if (position == RecyclerView.NO_POSITION) {
+            return false;
+        }
+
+        final View itemView = getHeaderView(parent, position);
+        if (itemView == null) {
+            return false;
+        }
+
+        final View child = itemView.findViewById(viewId);
+        if (child == null) {
+            return false;
+        }
+
+        final Rect headerOffset = mHeaderCache.getHeaderRect(position);
+        final Rect childRect = new Rect(
+                child.getLeft() + headerOffset.left,
+                child.getTop() + headerOffset.top,
+                child.getRight() + headerOffset.left,
+                child.getBottom() + headerOffset.top
+        );
+
+        return childRect.contains(x, y);
+    }
 }

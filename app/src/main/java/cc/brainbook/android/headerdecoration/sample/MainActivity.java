@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -167,6 +168,31 @@ public class MainActivity extends AppCompatActivity {
 
         // Add divider decoration
         mRecyclerView.addItemDecoration(new DividerDecoration(this));
+
+        ///[UPGRADE#handle click-event in RecyclerView.ItemDecoration]
+        mRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+            @Override
+            public boolean onInterceptTouchEvent(@NonNull RecyclerView recyclerView, @NonNull MotionEvent e) {
+                // only use the "UP" motion event, discard all others
+                if (e.getAction() == MotionEvent.ACTION_UP) {
+                    // find the view on the header that was clicked
+                    if (mHeaderDecoration.isViewClicked(recyclerView, (int) e.getX(), (int) e.getY(), R.id.iv_delete_all)) {  ///<--- here can check if you clicked the button.
+
+                        // do what you want. It works very well.
+                        // Toast.... etc...
+
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public void onTouchEvent(RecyclerView rv, MotionEvent e) {}
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {}
+        });
 
         // Add touch listeners
         final HeaderTouchListener headerTouchListener =
