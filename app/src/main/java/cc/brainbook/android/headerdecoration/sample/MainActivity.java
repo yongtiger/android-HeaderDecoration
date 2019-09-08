@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onTouchEvent(RecyclerView rv, MotionEvent e) {}
+            public void onTouchEvent(@NonNull RecyclerView recyclerView, @NonNull MotionEvent e) {}
 
             @Override
             public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {}
