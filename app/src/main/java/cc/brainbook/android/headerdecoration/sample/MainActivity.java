@@ -17,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -180,10 +181,25 @@ public class MainActivity extends AppCompatActivity {
 
                         // do what you want. It works very well.
                         // Toast.... etc...
+                        ///get header position
+                        final int position = mHeaderDecoration.findHeaderPositionUnder((int) e.getX(), (int) e.getY());
+                        if (position != RecyclerView.NO_POSITION) {
 
-                        return true;
+                            ///get header view and reset its visibility
+                            final View headerView = mHeaderDecoration.getHeaderView(mRecyclerView, position);
+                            ImageView iv = headerView.findViewById(R.id.iv_delete_all);
+                            iv.setVisibility(View.INVISIBLE);
+
+                            ///redraw decorations
+                            recyclerView.invalidateItemDecorations();
+
+                            return true;
+                        }
+
+                        return false;
                     }
                 }
+
                 return false;
             }
 
