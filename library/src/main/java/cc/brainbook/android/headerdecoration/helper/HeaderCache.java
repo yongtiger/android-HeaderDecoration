@@ -16,10 +16,6 @@ public class HeaderCache {
 
     private final HeaderAdapter<RecyclerView.ViewHolder> mHeaderAdapter;
     private final LongSparseArray<View> mHeaderViews = new LongSparseArray<>();
-    ///[UPGRADE#getHeaderViews()]
-    public LongSparseArray<View> getHeaderViews() {
-        return mHeaderViews;
-    }
     private final LongSparseArray<Integer> mHeaderFirstChildPosition = new LongSparseArray<>();
     private final LongSparseArray<Integer> mHeaderChildCount = new LongSparseArray<>();
     private final SparseArray<Rect> mHeaderRects = new SparseArray<>();
@@ -72,6 +68,10 @@ public class HeaderCache {
         return header;
     }
 
+    ///[UPGRADE#getHeaderViews()]
+    public LongSparseArray<View> getHeaderViews() {
+        return mHeaderViews;
+    }
 
     /**
      * 获取给定position的header组的元素总数
