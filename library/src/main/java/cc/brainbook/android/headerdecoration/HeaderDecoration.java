@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.v4.util.LongSparseArray;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -230,6 +231,11 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
 
     public View getHeaderView(RecyclerView parent, int position) {
         return mHeaderCache.getHeaderView(parent, position);
+    }
+
+    ///[UPGRADE#getHeaderViews()]
+    public LongSparseArray<View> getHeaderViews() {
+        return mHeaderCache.getHeaderViews();
     }
 
     public int findHeaderPositionUnder(int x, int y) {
