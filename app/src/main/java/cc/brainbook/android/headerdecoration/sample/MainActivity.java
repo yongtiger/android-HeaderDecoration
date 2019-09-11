@@ -179,7 +179,6 @@ public class MainActivity extends AppCompatActivity {
                     ///get header position
                     final int position = mHeaderDecoration.findHeaderPositionUnder((int) e.getX(), (int) e.getY());
                     if (position != RecyclerView.NO_POSITION) {
-
                         // find the view on the header that was clicked
                         if (mHeaderDecoration.getHeaderChildRect(recyclerView, position, R.id.iv_delete_all)
                                 .contains((int) e.getX(), (int) e.getY())) {
