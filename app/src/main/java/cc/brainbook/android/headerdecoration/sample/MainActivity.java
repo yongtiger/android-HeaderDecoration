@@ -176,14 +176,16 @@ public class MainActivity extends AppCompatActivity {
             public boolean onInterceptTouchEvent(@NonNull RecyclerView recyclerView, @NonNull MotionEvent e) {
                 // only use the "UP" motion event, discard all others
                 if (e.getAction() == MotionEvent.ACTION_UP) {
-                    // find the view on the header that was clicked
-                    if (mHeaderDecoration.isViewClicked(recyclerView, (int) e.getX(), (int) e.getY(), R.id.iv_delete_all)) {  ///<--- here can check if you clicked the button.
+                    ///get header position
+                    final int position = mHeaderDecoration.findHeaderPositionUnder((int) e.getX(), (int) e.getY());
+                    if (position != RecyclerView.NO_POSITION) {
 
-                        // do what you want. It works very well.
-                        // Toast.... etc...
-                        ///get header position
-                        final int position = mHeaderDecoration.findHeaderPositionUnder((int) e.getX(), (int) e.getY());
-                        if (position != RecyclerView.NO_POSITION) {
+                        // find the view on the header that was clicked
+                        if (mHeaderDecoration.getHeaderChildRect(recyclerView, position, R.id.iv_delete_all)
+                                .contains((int) e.getX(), (int) e.getY())) {
+
+                            // do what you want. It works very well.
+                            // Toast.... etc...
 
                             ///get header view and reset its visibility
                             final View headerView = mHeaderDecoration.getHeaderView(mRecyclerView, position);
@@ -195,8 +197,6 @@ public class MainActivity extends AppCompatActivity {
 
                             return true;
                         }
-
-                        return false;
                     }
                 }
 

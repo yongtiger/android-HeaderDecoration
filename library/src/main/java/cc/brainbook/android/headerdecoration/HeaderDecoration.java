@@ -259,38 +259,50 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
     //2) Make use of RecyclerView.addOnItemTouchListener(), remember the motion event argument has been translated into RecyclerView's coordinate system.
     //3) Use a real header view, but that will go a little far I think.
     /**
-     * Checks if the view on the header is clicked
+     * Will provide a header Rect for a given position in the RecyclerView.
      *
-     * @param parent the parent recycler view for drawing the header into
-     * @param x : getX
-     * @param y : getY
-     * @param viewId : resource id of view you clicked.
-     * @return
+     * @param position      position of header
+     * @return              A header Rect
      */
-    public boolean isViewClicked(RecyclerView parent, int x, int y, @IdRes int viewId) {
-        final int position = findHeaderPositionUnder(x, y);
-        if (position == RecyclerView.NO_POSITION) {
-            return false;
+    public Rect getHeaderRect(int position) {
+        if (position == RecyclerView.NO_POSITION || mHeaderCache == null) {
+            return null;
         }
 
-        final View itemView = getHeaderView(parent, position);
-        if (itemView == null) {
-            return false;
-        }
-
-        final View child = itemView.findViewById(viewId);
-        if (child == null) {
-            return false;
-        }
-
-        final Rect headerOffset = mHeaderCache.getHeaderRect(position);
-        final Rect childRect = new Rect(
-                child.getLeft() + headerOffset.left,
-                child.getTop() + headerOffset.top,
-                child.getRight() + headerOffset.left,
-                child.getBottom() + headerOffset.top
-        );
-
-        return childRect.contains(x, y);
+        return mHeaderCache.getHeaderRect(position);
     }
+
+    /**
+     * Will provide a header child Rect for a given position in the RecyclerView.
+     *
+     * @param parent        the parent recycler view for drawing the header into
+     * @param position      position of header
+     * @param headerChildViewId : resource id of view you clicked.
+     * @return              A header child Rect
+     */
+    public Rect getHeaderChildRect(RecyclerView parent, int position, @IdRes int headerChildViewId) {
+        if (position == RecyclerView.NO_POSITION || mHeaderCache == null) {
+            return null;
+        }
+
+        final View headerView = getHeaderView(parent, position);
+        if (headerView == null) {
+            return null;
+        }
+
+        final View headerChildView = headerView.findViewById(headerChildViewId);
+        if (headerChildView == null) {
+            return null;
+        }
+
+        final Rect headerRect = mHeaderCache.getHeaderRect(position);
+
+        return new Rect(
+                headerChildView.getLeft() + headerRect.left,
+                headerChildView.getTop() + headerRect.top,
+                headerChildView.getRight() + headerRect.left,
+                headerChildView.getBottom() + headerRect.top
+        );
+    }
+
 }
