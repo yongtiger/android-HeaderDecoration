@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
             @Override
             public boolean onInterceptTouchEvent(@NonNull RecyclerView recyclerView, @NonNull MotionEvent e) {
-                // only use the "UP" motion event, discard all others
+                // only use the "ACTION_DOWN" motion event, discard all others
                 if (e.getAction() == MotionEvent.ACTION_DOWN) {
                     ///get header position
                     final int position = mHeaderDecoration.findHeaderPositionUnder((int) e.getX(), (int) e.getY());
