@@ -4,13 +4,13 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onInterceptTouchEvent(@NonNull RecyclerView recyclerView, @NonNull MotionEvent e) {
                 // only use the "UP" motion event, discard all others
-                if (e.getAction() == MotionEvent.ACTION_UP) {
+                if (e.getAction() == MotionEvent.ACTION_DOWN) {
                     ///get header position
                     final int position = mHeaderDecoration.findHeaderPositionUnder((int) e.getX(), (int) e.getY());
                     if (position != RecyclerView.NO_POSITION) {
@@ -260,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class AnimalsHeadersAdapter extends AnimalsAdapter<RecyclerView.ViewHolder>
+    private static class AnimalsHeadersAdapter extends AnimalsAdapter<RecyclerView.ViewHolder>
             implements HeaderAdapter<RecyclerView.ViewHolder> {
         @NonNull
         @Override

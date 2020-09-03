@@ -2,13 +2,13 @@ package cc.brainbook.android.headerdecoration;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
-import android.support.v4.util.LongSparseArray;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.collection.LongSparseArray;
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
 import cc.brainbook.android.headerdecoration.helper.HeaderHelper;

@@ -1,6 +1,6 @@
 package cc.brainbook.android.headerdecoration.util;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import cc.brainbook.android.headerdecoration.interfaces.HeaderAdapter;
 

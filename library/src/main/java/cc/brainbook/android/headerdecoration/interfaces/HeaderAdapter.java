@@ -1,6 +1,6 @@
 package cc.brainbook.android.headerdecoration.interfaces;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.ViewGroup;
 
 public interface HeaderAdapter<VH extends RecyclerView.ViewHolder> {

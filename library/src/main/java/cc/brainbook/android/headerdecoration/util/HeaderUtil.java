@@ -1,7 +1,7 @@
 package cc.brainbook.android.headerdecoration.util;
 
 import android.graphics.Rect;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.LinearLayout;
 
