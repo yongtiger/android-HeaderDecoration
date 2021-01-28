@@ -10,7 +10,7 @@ import static android.view.ViewGroup.MarginLayoutParams;
 /**
  * Helper to calculate various view dimensions
  */
-public class DimensionUtil {
+public abstract class DimensionUtil {
 
     /**
      * Populates {@link Rect} with margins for any view.
@@ -34,5 +34,4 @@ public class DimensionUtil {
         }
     }
 
-    private DimensionUtil() {}
 }

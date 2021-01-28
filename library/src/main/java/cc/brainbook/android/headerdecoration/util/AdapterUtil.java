@@ -4,7 +4,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import cc.brainbook.android.headerdecoration.interfaces.HeaderAdapter;
 
-public class AdapterUtil {
+public abstract class AdapterUtil {
 
     /**
      * Determines if an item in the list should have a header that is different than the item in the
@@ -76,5 +76,4 @@ public class AdapterUtil {
         return position < 0 || position >= adapter.getItemCount();
     }
 
-    private AdapterUtil() {}
 }

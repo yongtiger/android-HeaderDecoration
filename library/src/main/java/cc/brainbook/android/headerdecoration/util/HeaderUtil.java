@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.LinearLayout;
 
-public class HeaderUtil {
+public abstract class HeaderUtil {
 
     /**
      * Initializes a clipping rect for the header based on the margins of the header and the padding of the
@@ -35,5 +35,4 @@ public class HeaderUtil {
         }
     }
 
-    private HeaderUtil() {}
 }

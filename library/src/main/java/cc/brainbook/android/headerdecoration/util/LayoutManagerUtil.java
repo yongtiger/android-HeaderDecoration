@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-public class LayoutManagerUtil {
+public abstract class LayoutManagerUtil {
 
     public static int getOrientation(@NonNull RecyclerView recyclerView) {
         final RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
@@ -49,5 +49,4 @@ public class LayoutManagerUtil {
         return LayoutManagerUtil.getClipToPadding(recyclerView) ? recyclerView.getPaddingLeft() : 0;
     }
 
-    private LayoutManagerUtil() {}
 }
