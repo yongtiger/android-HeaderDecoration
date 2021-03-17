@@ -287,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public RecyclerView.ViewHolder onCreateHeaderViewHolder(ViewGroup parent) {
+        public RecyclerView.ViewHolder onCreateHeaderViewHolder(@NonNull ViewGroup parent) {
             final View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.view_header, parent, false);
             return new RecyclerView.ViewHolder(view) {
@@ -295,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindHeaderViewHolder(RecyclerView.ViewHolder holder, int position) {
+        public void onBindHeaderViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
             final TextView textView = (TextView) holder.itemView.findViewById(R.id.tv_text);
             textView.setText(String.valueOf(getItem(position).charAt(0)));
             holder.itemView.setBackgroundColor(getRandomColor());

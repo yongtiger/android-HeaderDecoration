@@ -31,7 +31,7 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
         return this.isSticky;
     }
 
-    private final HeaderAdapter mHeaderAdapter;
+    private final HeaderAdapter<RecyclerView.ViewHolder> mHeaderAdapter;
     private final ItemVisibilityAdapter mVisibilityAdapter;
     private final HeaderCache mHeaderCache;
     private final HeaderHelper mHeaderHelper;
@@ -54,7 +54,7 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
                 new HeaderCache(headerAdapter));
     }
 
-    private HeaderDecoration(HeaderAdapter headerAdapter,
+    private HeaderDecoration(HeaderAdapter<RecyclerView.ViewHolder> headerAdapter,
                              ItemVisibilityAdapter visibilityAdapter,
                              HeaderCache headerViewCache) {
         this(headerAdapter,
@@ -63,7 +63,7 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
                 new HeaderHelper(headerAdapter, headerViewCache));
     }
 
-    private HeaderDecoration(HeaderAdapter headerAdapter,
+    private HeaderDecoration(HeaderAdapter<RecyclerView.ViewHolder> headerAdapter,
                              ItemVisibilityAdapter visibilityAdapter,
                              HeaderCache headerViewCache,
                              HeaderHelper headerPositionCalculator) {
@@ -101,7 +101,7 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
                             ///每组header的最后一个元素要补齐span为占满整行（无论是否Grid reverse）
                             ///注意：无论是否Grid reverse，每行都是从左到右依次递增的！
                             final int headerItemPosition = LayoutManagerUtil.getReverseLayout(parent) ? position :
-                                    AdapterUtil.getNextItemPosition((RecyclerView.Adapter) mHeaderAdapter, position, false);
+                                    AdapterUtil.getNextItemPosition((RecyclerView.Adapter<RecyclerView.ViewHolder>) mHeaderAdapter, position, false);
                             if (AdapterUtil.hasNewHeader(mHeaderAdapter, headerItemPosition, LayoutManagerUtil.getReverseLayout(parent))) {
                                 final int headerFirstChildPosition = mHeaderCache.getHeaderFirstChildPosition(position);
                                 return gridLayoutManager.getSpanCount() - ((position - headerFirstChildPosition) % gridLayoutManager.getSpanCount());
@@ -177,7 +177,7 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
         super.onDrawOver(canvas, parent, state);
 
         final int childCount = parent.getChildCount();
-        if (childCount <= 0 || ((RecyclerView.Adapter) mHeaderAdapter).getItemCount() <= 0) {
+        if (childCount <= 0 || ((RecyclerView.Adapter<RecyclerView.ViewHolder>) mHeaderAdapter).getItemCount() <= 0) {
             return;
         }
 

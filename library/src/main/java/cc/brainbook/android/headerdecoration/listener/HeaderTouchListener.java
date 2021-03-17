@@ -27,9 +27,9 @@ public class HeaderTouchListener implements RecyclerView.OnItemTouchListener {
         mHeaderDecoration = decor;
     }
 
-    public HeaderAdapter getAdapter() {
+    public HeaderAdapter<RecyclerView.ViewHolder> getAdapter() {
         if (mRecyclerView.getAdapter() instanceof HeaderAdapter) {
-            return (HeaderAdapter) mRecyclerView.getAdapter();
+            return (HeaderAdapter<RecyclerView.ViewHolder>) mRecyclerView.getAdapter();
         } else {
             throw new IllegalStateException("A RecyclerView with " +
                     HeaderTouchListener.class.getSimpleName() +

@@ -2,6 +2,7 @@ package cc.brainbook.android.headerdecoration.helper;
 
 import android.graphics.Rect;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
@@ -17,7 +18,7 @@ import cc.brainbook.android.headerdecoration.util.LayoutManagerUtil;
  */
 public class HeaderHelper {
 
-    private final HeaderAdapter mHeaderAdapter;
+    private final HeaderAdapter<RecyclerView.ViewHolder> mHeaderAdapter;
     private final HeaderCache mHeaderCache;
 
     /**
@@ -27,7 +28,7 @@ public class HeaderHelper {
     private final Rect mMarginRect1 = new Rect();
     private final Rect mMarginRect2 = new Rect();
 
-    public HeaderHelper(HeaderAdapter headerAdapter, HeaderCache headerCache) {
+    public HeaderHelper(HeaderAdapter<RecyclerView.ViewHolder> headerAdapter, HeaderCache headerCache) {
         mHeaderAdapter = headerAdapter;
         mHeaderCache = headerCache;
     }
@@ -70,10 +71,12 @@ public class HeaderHelper {
 
         if (firstHeader && isStickyHeaderBeingPushedOffscreen(recyclerView, header)) {
             final View viewAfterNextHeader = getFirstViewUnObscuredByHeader(recyclerView, header);
-            final int firstViewUnderHeaderPosition = recyclerView.getChildAdapterPosition(viewAfterNextHeader);
-            final View secondHeader = mHeaderCache.getHeaderView(recyclerView, firstViewUnderHeaderPosition);
-            translateHeaderWithNextHeader(recyclerView, LayoutManagerUtil.getOrientation(recyclerView), bounds,
-                    header, viewAfterNextHeader, secondHeader);
+            if (viewAfterNextHeader != null) {
+                final int firstViewUnderHeaderPosition = recyclerView.getChildAdapterPosition(viewAfterNextHeader);
+                final View secondHeader = mHeaderCache.getHeaderView(recyclerView, firstViewUnderHeaderPosition);
+                translateHeaderWithNextHeader(recyclerView, LayoutManagerUtil.getOrientation(recyclerView), bounds,
+                        header, viewAfterNextHeader, secondHeader);
+            }
         }
     }
 
@@ -126,6 +129,9 @@ public class HeaderHelper {
 
     private boolean isStickyHeaderBeingPushedOffscreen(RecyclerView recyclerView, View stickyHeader) {
         final View viewAfterHeader = getFirstViewUnObscuredByHeader(recyclerView, stickyHeader);
+        if (viewAfterHeader == null) {
+            return false;
+        }
         final int firstViewUnderHeaderPosition = recyclerView.getChildAdapterPosition(viewAfterHeader);
         if (firstViewUnderHeaderPosition == RecyclerView.NO_POSITION) {
             return false;
@@ -180,6 +186,7 @@ public class HeaderHelper {
      * @param parent        RecyclerView containing all the list items
      * @return first        item that is fully beneath a header
      */
+    @Nullable
     private View getFirstViewUnObscuredByHeader(@NonNull RecyclerView parent, @NonNull View firstHeader) {
         final int step = LayoutManagerUtil.getReverseLayout(parent) ? -1 : 1;
         final int from = LayoutManagerUtil.getReverseLayout(parent) ? parent.getChildCount() - 1 : 0;

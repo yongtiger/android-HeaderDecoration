@@ -15,8 +15,8 @@ public abstract class AdapterUtil {
      * @param isReverseLayout   TRUE if layout manager has flag getReverseLayout
      * @return                  TRUE if this item has a different header than the previous item in the list
      */
-    public static boolean hasNewHeader(HeaderAdapter headerAdapter, int position, boolean isReverseLayout) {
-        if (indexOutOfBounds((RecyclerView.Adapter) headerAdapter, position)) {
+    public static boolean hasNewHeader(HeaderAdapter<RecyclerView.ViewHolder> headerAdapter, int position, boolean isReverseLayout) {
+        if (indexOutOfBounds((RecyclerView.Adapter<RecyclerView.ViewHolder>) headerAdapter, position)) {
             return false;
         }
 
@@ -26,7 +26,7 @@ public abstract class AdapterUtil {
         }
 
         long prevItemHeaderId = getPrevItemHeaderId(headerAdapter, position, isReverseLayout);
-        final int firstItemPosition = getFirstItemPosition((RecyclerView.Adapter) headerAdapter, isReverseLayout);
+        final int firstItemPosition = getFirstItemPosition((RecyclerView.Adapter<RecyclerView.ViewHolder>) headerAdapter, isReverseLayout);
 
         ///[FIX#Reverse时下拉到顶，最上面元素（即最后一个position）的header不显示]
         if (isReverseLayout && position == firstItemPosition) {
@@ -36,43 +36,43 @@ public abstract class AdapterUtil {
         return position == firstItemPosition || headerId != prevItemHeaderId;
     }
 
-    public static long getPrevItemHeaderId(HeaderAdapter headerAdapter, int position, boolean isReverseLayout) {
+    public static long getPrevItemHeaderId(HeaderAdapter<RecyclerView.ViewHolder> headerAdapter, int position, boolean isReverseLayout) {
         long prevItemHeaderId = -1;
-        final int prevItemPosition = getPrevItemPosition((RecyclerView.Adapter) headerAdapter, position, isReverseLayout);
+        final int prevItemPosition = getPrevItemPosition((RecyclerView.Adapter<RecyclerView.ViewHolder>) headerAdapter, position, isReverseLayout);
         if (prevItemPosition != RecyclerView.NO_POSITION) {
             prevItemHeaderId = headerAdapter.getHeaderId(prevItemPosition);
         }
         return prevItemHeaderId;
     }
 
-    public static long getNextItemHeaderId(HeaderAdapter headerAdapter, int position, boolean isReverseLayout) {
+    public static long getNextItemHeaderId(HeaderAdapter<RecyclerView.ViewHolder> headerAdapter, int position, boolean isReverseLayout) {
         long nextItemHeaderId = -1;
-        final int nextItemPosition = getNextItemPosition((RecyclerView.Adapter) headerAdapter, position, isReverseLayout);
+        final int nextItemPosition = getNextItemPosition((RecyclerView.Adapter<RecyclerView.ViewHolder>) headerAdapter, position, isReverseLayout);
         if (nextItemPosition != RecyclerView.NO_POSITION) {
             nextItemHeaderId = headerAdapter.getHeaderId(nextItemPosition);
         }
         return nextItemHeaderId;
     }
 
-    public static int getFirstItemPosition(RecyclerView.Adapter adapter, boolean isReverseLayout) {
+    public static int getFirstItemPosition(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter, boolean isReverseLayout) {
         return isReverseLayout ? adapter.getItemCount() - 1 : 0;
     }
 
-    public static int getLastItemPosition(RecyclerView.Adapter adapter, boolean isReverseLayout) {
+    public static int getLastItemPosition(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter, boolean isReverseLayout) {
         return isReverseLayout ? 0 : adapter.getItemCount() - 1;
     }
 
-    public static int getPrevItemPosition(RecyclerView.Adapter adapter, int position, boolean isReverseLayout) {
+    public static int getPrevItemPosition(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter, int position, boolean isReverseLayout) {
         final int prevItemPosition = position + (isReverseLayout ? 1 : -1);
         return indexOutOfBounds(adapter, prevItemPosition) ? RecyclerView.NO_POSITION : prevItemPosition;
     }
 
-    public static int getNextItemPosition(RecyclerView.Adapter adapter, int position, boolean isReverseLayout) {
+    public static int getNextItemPosition(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter, int position, boolean isReverseLayout) {
         final int nextItemPosition = position + (isReverseLayout ? -1 : 1);
         return indexOutOfBounds(adapter, nextItemPosition) ? RecyclerView.NO_POSITION : nextItemPosition;
     }
 
-    public static boolean indexOutOfBounds(RecyclerView.Adapter adapter, int position) {
+    public static boolean indexOutOfBounds(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter, int position) {
         return position < 0 || position >= adapter.getItemCount();
     }
 

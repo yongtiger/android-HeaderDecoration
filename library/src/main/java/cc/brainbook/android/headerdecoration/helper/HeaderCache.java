@@ -88,7 +88,7 @@ public class HeaderCache {
             final int headerFirstChildPosition = getHeaderFirstChildPosition(position);
             headerChildCount = position - headerFirstChildPosition + 1;
 
-            for (int i = position + 1; i < ((RecyclerView.Adapter)mHeaderAdapter).getItemCount()
+            for (int i = position + 1; i < ((RecyclerView.Adapter<RecyclerView.ViewHolder>)mHeaderAdapter).getItemCount()
                     && mHeaderAdapter.getHeaderId(i) == headerId; i++) {
                 headerChildCount++;
             }
