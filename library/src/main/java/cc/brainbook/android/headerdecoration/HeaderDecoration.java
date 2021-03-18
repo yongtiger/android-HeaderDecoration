@@ -5,7 +5,6 @@ import android.graphics.Rect;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.collection.LongSparseArray;
-import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,7 +20,6 @@ import cc.brainbook.android.headerdecoration.util.HeaderUtil;
 import cc.brainbook.android.headerdecoration.util.LayoutManagerUtil;
 
 public class HeaderDecoration extends RecyclerView.ItemDecoration {
-
     ///[isSticky]
     private boolean isSticky = true;
     public void isSticky(boolean isSticky) {
