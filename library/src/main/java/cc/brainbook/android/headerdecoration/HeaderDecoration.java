@@ -20,6 +20,8 @@ import cc.brainbook.android.headerdecoration.util.HeaderUtil;
 import cc.brainbook.android.headerdecoration.util.LayoutManagerUtil;
 
 public class HeaderDecoration extends RecyclerView.ItemDecoration {
+    public static final long NO_ITEM_ID = -1L;
+
     ///[isSticky]
     private boolean isSticky = true;
     public void isSticky(boolean isSticky) {
